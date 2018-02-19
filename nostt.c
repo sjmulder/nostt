@@ -62,7 +62,9 @@ putcell(struct ttpage *page, int line, int col)
 
 	wc = page->chars[line][col];
 #if DEBUG_CHARS
-	printf("%04x %lc ", wc, wc);
+	printf("%04x %lc ", wc);
+#elif DEBUG_COLORS
+	printf("%x%x %lc ", attrs->fg, attrs->bg, wc);
 #else
 	printf("%lc", wc);
 #endif
