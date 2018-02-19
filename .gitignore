@@ -1,1 +1,4 @@
+config.h
+config.mk
 nostt
+*.o

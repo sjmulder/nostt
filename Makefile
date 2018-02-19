@@ -1,7 +1,15 @@
-CFLAGS  += -Wall -I/usr/local/include -O2
-LDFLAGS += -L/usr/local/lib
-LDLIBS   = -lcurl -lyajl
+include config.mk
+
+TARGET  = nostt
+OBJECTS = nostt.o api.o
 
 all: nostt
 
-clean: ; rm -f nostt
+nostt: $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LDLIBS)
+
+nostt.o: api.h config.h
+api.o:   api.h config.h
+
+clean:
+	rm -f *.o nostt
