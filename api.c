@@ -266,6 +266,10 @@ parse(const char *html, struct ttpage *page)
 	enum parsest	 state		= PS_IN_TEXT;
 	struct ttattrs	 curattrs	= defattrs;
 
+#if DEBUG_HTML
+	puts(html);
+#endif
+
 	p = html;
 	while (line < TT_NLINES) {
 		/* clear rest of line if EOL or EOF */
