@@ -1,6 +1,8 @@
 #define DEBUG_IO	0
 #define DEBUG_HTML	0
 
+#define SUBST_CHAR	'%'
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -98,7 +100,7 @@ mapboxchar(wchar_t wc, enum ttmapmode mode)
 {
 	switch (mode) {
 	case TT_MASCII:
-		return wc > 0x7F ? L' ' : wc;
+		return wc > 0x7F ? SUBST_CHAR : wc;
 	case TT_MUNICODE:
 		break; /* continue below */
 	case TT_MNONE:

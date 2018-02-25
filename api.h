@@ -40,7 +40,7 @@ enum tterr {
    placeholder character (TT_MASCII, '.'). */
 enum ttmapmode {
 	TT_MDEFAULT,
-	TT_MASCII = TT_MDEFAULT, /* remap all chars >127 to ' ' */
+	TT_MASCII = TT_MDEFAULT, /* remap all chars >127 to a substitute */
 	TT_MNONE,	/* 2x3 box drawing chars in 0xF000 range */
 	TT_MUNICODE,	/* remap to 2x2 Unicode block drawing chars */
 };
