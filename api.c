@@ -290,13 +290,6 @@ parse(const char *html, struct ttpage *page)
 			continue;
 		}
 
-		/* ignore input beyond line length */
-		if (col >= TT_NCOLS) {
-			while (*p != '\0' && *p != '\n')
-				p++;
-			continue;
-		}
-
 		/* unescape hex escapes, used for block drawing characters */
 		if (!strncmp("&#x", p, 3)) {
 			wc = (wchar_t)strtol(p+3, (char **)&p, 16);
@@ -313,9 +306,12 @@ parse(const char *html, struct ttpage *page)
 				state = PS_IN_TAG;
 				break;
 			default:
-				page->chars[line][col] = wc;
-				page->attrs[line][col] = curattrs;
-				col++;
+				/* ignore input beyond line length */
+				if (col < TT_NCOLS) {
+					page->chars[line][col] = wc;
+					page->attrs[line][col] = curattrs;
+					col++;
+				}
 				break;
 			}
 			break;
