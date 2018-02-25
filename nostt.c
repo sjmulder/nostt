@@ -105,6 +105,11 @@ main(int argc, char **argv)
 #endif
 		}
 
+		/* If a subpage was requested (e.g. 101-2), don't print any
+		   further pages. */
+		if (id == argv[1] && strchr(id, '-'))
+			break;
+
 		putchar('\n');
 		id = page.nextsub;
 	}
