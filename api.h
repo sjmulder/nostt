@@ -33,7 +33,7 @@ enum tterr {
 
     .x      .x
     .x  ->  xx
-    xx 
+    xx
 
    This is the TT_MUNICODE mode below. The other options are to leave the
    characters as-is (requiring a custom font) and replacement with a
@@ -47,7 +47,7 @@ enum ttmapmode {
 
 struct ttattrs {
 	enum ttcolor	fg;
-	enum ttcolor	bg;	
+	enum ttcolor	bg;
 };
 
 struct ttpage {
