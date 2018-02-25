@@ -100,8 +100,9 @@ main(int argc, char **argv)
 
 #if ENABLE_COLOR
 			puts("\e[0m");
-#endif
+#else
 			putchar('\n');
+#endif
 		}
 
 		putchar('\n');
