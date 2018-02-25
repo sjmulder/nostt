@@ -1,5 +1,6 @@
 #define DEBUG_IO	0
 #define DEBUG_HTML	0
+#define DEBUG_PARSER	0
 
 #define SUBST_CHAR	'%'
 
@@ -22,6 +23,12 @@
 # define debug_io	printf
 #else
 # define debug_io(...)	(void)0
+#endif
+
+#if DEBUG_PARSER
+# define debug_parser	printf
+#else
+# define debug_parser(...) (void)0
 #endif
 
 const char *tt_useragent	= "nostt";
@@ -191,7 +198,7 @@ parsecolor(const char *str, const char *end, enum ttcolor *color)
 	int	i;
 	size_t	len;
 
-#if DEBUG
+#if DEBUG_PARSER
 	printf("parsecolor: '");
 	fwrite(str, end-str, 1, stdout);
 	printf("'\n");
@@ -214,7 +221,7 @@ parsecolors(const char *str, const char *end, struct ttattrs *attrs)
 	enum ttcolor	*color;
 	const char	*wordend;
 
-#if DEBUG
+#if DEBUG_PARSER
 	printf("parsecolors: '");
 	fwrite(str, end-str, 1, stdout);
 	printf("'\n");
@@ -276,8 +283,16 @@ parse(const char *html, struct ttpage *page)
 
 	p = html;
 	while (line < TT_NLINES) {
+#if DEBUG_PARSER
+		if (isprint(*p))
+			debug_parser("got '%c'\n", *p);
+		else
+			debug_parser("got %02x\n", *p);
+#endif
+
 		/* clear rest of line if EOL or EOF */
 		if (*p == '\0' || *p == '\n') {
+			debug_parser("filling up line\n");
 			if (*p == '\n')
 				p++;
 			while (col < TT_NCOLS) {
@@ -292,9 +307,16 @@ parse(const char *html, struct ttpage *page)
 
 		/* unescape hex escapes, used for block drawing characters */
 		if (!strncmp("&#x", p, 3)) {
+			debug_parser("skipping hex character\n");
 			wc = (wchar_t)strtol(p+3, (char **)&p, 16);
 			if (!*p)
 				p++; /* skip the ';' */
+#if DEBUG_PARSER
+			if (isprint(*p))
+				debug_parser("now got '%c'\n", wc);
+			else
+				debug_parser("now got %02x\n", wc);
+#endif
 		} else {
 			wc = *p;
 		}
@@ -303,11 +325,16 @@ parse(const char *html, struct ttpage *page)
 		case PS_IN_TEXT:
 			switch (wc) {
 			case '<':
+				debug_parser("-> PS_IN_TAG\n");
 				state = PS_IN_TAG;
 				break;
 			default:
 				/* ignore input beyond line length */
-				if (col < TT_NCOLS) {
+				if (col >= TT_NCOLS) {
+					debug_parser("skipping, past EOL\n");
+				} else {
+					debug_parser("assigning %i,%i\n",
+					    line, col);
 					page->chars[line][col] = wc;
 					page->attrs[line][col] = curattrs;
 					col++;
@@ -320,13 +347,16 @@ parse(const char *html, struct ttpage *page)
 			switch (wc) {
 			case '/':
 				/* end tag, reset color attributes */
+				debug_parser("resetting curattrs\n");
 				curattrs = defattrs;
 				break;
 			case '"':
+				debug_parser("-> PS_IN_ATTRQUOTES\n");
 				state = PS_IN_ATTRQUOTES;
 				openquote = p;
 				break;
 			case '>':
+				debug_parser("-> PS_IN_TEXT\n");
 				state = PS_IN_TEXT;
 				break;
 			}
@@ -335,15 +365,18 @@ parse(const char *html, struct ttpage *page)
 		case PS_IN_ATTRQUOTES:
 			switch (wc) {
 			case '"':
+				debug_parser("-> PS_IN_TAG\n");
 				state = PS_IN_TAG;
 				closequote = p;
 				break;
 			case '>':
+				debug_parser("-> PS_IN_TEXT\n");
 				state = PS_IN_TEXT;
 				closequote = p;
 				break;
 			}
 			if (state != PS_IN_ATTRQUOTES) {
+				debug_parser("parsing color\n");
 				/* we assume the attribute is 'class', so
 				   parse the colors */
 				parsecolors(openquote+1, closequote,
