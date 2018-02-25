@@ -1,4 +1,8 @@
-#include "config.h"
+#define DEBUG_CHARS	0
+#define DEBUG_COLORS	0
+
+#define ENABLE_COLOR	1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

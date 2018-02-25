@@ -1,4 +1,6 @@
-#include "config.h"
+#define DEBUG_IO	0
+#define DEBUG_HTML	0
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
