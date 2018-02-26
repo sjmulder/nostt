@@ -288,7 +288,6 @@ tt_get(const char *id, struct ttpage *page)
 
 	strncpy(page->id, id, LEN(page->id)-1);
 	page->id[LEN(page->id)-1] = '\0';
-
 	page->nextpage[0] = '\0';
 	page->nextsub[0] = '\0';
  
@@ -312,11 +311,10 @@ tt_get(const char *id, struct ttpage *page)
 
 	parse(html, page);
 
+	/* Map block drawing characters */
 	for (line = 0; line < TT_NLINES; line++) {
 		for (col = 0; col < TT_NCOLS; col++) {
 			wcp = &page->chars[line][col];
-
-			/* Map block drawing characters */
 			if (*wcp >= 0xF000)
 				*wcp = SUBST_CHAR;	
 		}
