@@ -51,17 +51,17 @@ putcell_color(struct ttpage *page, int line, int col)
 	wchar_t		 wc;
 	struct ttattrs	*attrs;
 	struct ttattrs	*prevattrs;
-	int		 colorflag;
+	int		 attrsflag;
 
 	attrs = &page->attrs[line][col];
-	if (!col) {
-		colorflag = 1;
-	} else {
+	if (!col)
+		attrsflag = 1;
+	else {
 		prevattrs = &page->attrs[line][col-1];
-		colorflag = memcmp(attrs, prevattrs, sizeof(*attrs));
+		attrsflag = memcmp(attrs, prevattrs, sizeof(*attrs));
 	}
 
-	if (colorflag)
+	if (attrsflag)
 		printf("\e[%d;%dm", mapfg(attrs->fg), mapbg(attrs->bg));
 
 	wc = page->chars[line][col];

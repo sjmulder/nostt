@@ -102,9 +102,8 @@ parsecolors(const char *str, const char *end, struct ttattrs *attrs)
 		if (memcmp("bg-", str, 3) == 0) {
 			color = &attrs->bg;
 			str += 3;
-		} else {
+		} else
 			color = &attrs->fg;
-		}
 
 		wordend = str+1;
 		while (wordend < end && !isspace(*wordend))
@@ -171,9 +170,8 @@ parse(const char *html, struct ttpage *page)
 			wc = (wchar_t)strtol(p+3, (char **)&p, 16);
 			if (!*p)
 				p++; /* skip the ';' */
-		} else {
+		} else
 			wc = *p;
-		}
 
 		switch (state) {
 		case PS_IN_TEXT:
