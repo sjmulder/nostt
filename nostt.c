@@ -1,4 +1,4 @@
-#define USAGE	"usage: nostt [-c] <page>"
+#define USAGE	"usage: nostt [-c] page[-subpage]"
 
 #include <unistd.h>
 #include <stdio.h>
