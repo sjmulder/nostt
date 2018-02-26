@@ -241,7 +241,7 @@ tt_get(const char *id, struct ttpage *page)
 	enum tterr		 err	= TT_OK;
 	char			 url[128];
 	CURL			*curl	= NULL;
-	int			 status;
+	long			 status;
 	struct jsonctx		 json;
 	struct json_object	*jval;
 	const char		*html;
