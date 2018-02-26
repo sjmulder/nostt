@@ -1,6 +1,6 @@
 /* nostt.c - Copyright (c) 2018, Sijmen J. Mulder (see LICENSE.md) */
 
-#define USAGE	"usage: nostt [-iG] page[-subpage]"
+#define USAGE	"usage: nostt [-iG] [page]"
 
 #define _WITH_GETLINE
 
