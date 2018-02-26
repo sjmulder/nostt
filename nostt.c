@@ -40,12 +40,6 @@ mapbg(enum ttcolor c)
 }
 
 static void
-putcell_bw(struct ttpage *page, int line, int col)
-{
-	printf("%lc", page->chars[line][col]);
-}
-
-static void
 putcell_color(struct ttpage *page, int line, int col)
 {
 	wchar_t		 wc;
@@ -108,13 +102,9 @@ main(int argc, char **argv)
 					putcell_color(&page, line, col);
 				puts("\e[0m");
 			}
-		} else {
-			for (line = 0; line < TT_NLINES; line++) {
-				for (col = 0; col < TT_NCOLS; col++)
-					putcell_bw(&page, line, col);
-				putchar('\n');
-			}
-		}
+		} else
+			for (line = 0; line < TT_NLINES; line++)
+				printf("%.*ls\n", TT_NCOLS, page.chars[line]);
 
 		/* If a subpage was requested (e.g. 101-2), don't print any
 		   further pages. */
