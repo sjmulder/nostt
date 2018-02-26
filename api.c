@@ -1,3 +1,5 @@
+/* api.c - Copyright (c) 2018, Sijmen J. Mulder (see LICENSE.md) */
+
 #define USERAGENT	"nostt"
 #define ENDPOINT	"http://teletekst-data.nos.nl/json/"
 #define SUBST_CHAR	'%'

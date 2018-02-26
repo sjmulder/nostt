@@ -1,3 +1,5 @@
+/* api.h - Copyright (c) 2018, Sijmen J. Mulder (see LICENSE.md) */
+
 #define TT_NLINES	24
 #define TT_NCOLS	40
 

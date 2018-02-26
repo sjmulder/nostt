@@ -1,3 +1,5 @@
+/* nostt.c - Copyright (c) 2018, Sijmen J. Mulder (see LICENSE.md) */
+
 #define USAGE	"usage: nostt [-ci] page[-subpage]"
 
 #define _WITH_GETLINE
