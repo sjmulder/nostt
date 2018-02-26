@@ -90,7 +90,6 @@ static const struct ttattrs defattrs = {
 	/* bg */	TT_BLACK
 };
 
-
 /* Callback for curl; directly forwards data to the JSON parser. */
 static size_t
 jsonwrite(char *ptr, size_t sz, size_t nmemb, struct jsonctx *ctx)
