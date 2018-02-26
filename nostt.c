@@ -1,9 +1,4 @@
-#define DEBUG_CHARS	0
-#define DEBUG_COLORS	0
-
-#define ENABLE_COLOR	1
-
-#define USAGE		"usage: nostt [-c] <page>"
+#define USAGE	"usage: nostt [-c] <page>"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -47,11 +42,7 @@ mapbg(enum ttcolor c)
 static void
 putcell_bw(struct ttpage *page, int line, int col)
 {
-#if DEBUG_CHARS
-	printf("%04x %lc ", page->chars[line][col]);
-#else
 	printf("%lc", page->chars[line][col]);
-#endif
 }
 
 static void
@@ -74,13 +65,7 @@ putcell_color(struct ttpage *page, int line, int col)
 		printf("\e[%d;%dm", mapfg(attrs->fg), mapbg(attrs->bg));
 
 	wc = page->chars[line][col];
-#if DEBUG_CHARS
-	printf("%04x %lc ", wc);
-#elif DEBUG_COLORS
-	printf("%x%x %lc ", attrs->fg, attrs->bg, wc);
-#else
 	printf("%lc", wc);
-#endif
 }
 
 int

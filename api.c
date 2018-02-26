@@ -1,7 +1,3 @@
-#define DEBUG_IO	0
-#define DEBUG_HTML	0
-#define DEBUG_PARSER	0
-
 #define USERAGENT	"nostt"
 #define ENDPOINT	"http://teletekst-data.nos.nl/json/"
 #define SUBST_CHAR	'%'
@@ -20,18 +16,6 @@
 #include "api.h"
 
 #define LEN(a) (sizeof(a)/sizeof(*(a)))
-
-#if DEBUG_IO
-# define debug_io	printf
-#else
-# define debug_io(...)	(void)0
-#endif
-
-#if DEBUG_PARSER
-# define debug_parser	printf
-#else
-# define debug_parser(...) (void)0
-#endif
 
 const char *tt_useragent	= "nostt";
 const char *tt_endpoint		= "http://teletekst-data.nos.nl/json/";
@@ -75,13 +59,10 @@ jsonwrite(char *ptr, size_t sz, size_t nmemb, struct jsonctx *ctx)
 {
 	enum json_tokener_error jsonerr;
 
-	debug_io("jsonwrite: sz=%zu nmemb=%zu\n", sz, nmemb);
-
 	if (ctx->err != TT_OK)
 		return 0;
 
 	if (ctx->object) {
-		debug_io("extraneous JSON data\n");
 		ctx->err = TT_EDATA;
 		return 0;
 	}
@@ -89,10 +70,8 @@ jsonwrite(char *ptr, size_t sz, size_t nmemb, struct jsonctx *ctx)
 	ctx->object = json_tokener_parse_ex(ctx->tokener, ptr, sz * nmemb);
 	if (!ctx->object) {
 		jsonerr = json_tokener_get_error(ctx->tokener);
-		if (jsonerr != json_tokener_continue) {
-			debug_io("JSON write error\n");
+		if (jsonerr != json_tokener_continue)
 			ctx->err = TT_EDATA;
-		}
 	}
 
 	return sz * nmemb;
@@ -104,12 +83,6 @@ parsecolor(const char *str, const char *end, enum ttcolor *color)
 {
 	int	i;
 	size_t	len;
-
-#if DEBUG_PARSER
-	printf("parsecolor: '");
-	fwrite(str, end-str, 1, stdout);
-	printf("'\n");
-#endif
 
 	for (i = 0; i < LEN(colornames); i++) {
 		len = strlen(colornames[i]);
@@ -127,12 +100,6 @@ parsecolors(const char *str, const char *end, struct ttattrs *attrs)
 {
 	enum ttcolor	*color;
 	const char	*wordend;
-
-#if DEBUG_PARSER
-	printf("parsecolors: '");
-	fwrite(str, end-str, 1, stdout);
-	printf("'\n");
-#endif
 
 	while (end - str > 3) {
 		if (memcmp("bg-", str, 3) == 0) {
@@ -186,22 +153,10 @@ parse(const char *html, struct ttpage *page)
 
 	attrstack[0] = defattrs;
 
-#if DEBUG_HTML
-	puts(html);
-#endif
-
 	p = html;
 	while (line < TT_NLINES) {
-#if DEBUG_PARSER
-		if (isprint(*p))
-			debug_parser("got '%c'\n", *p);
-		else
-			debug_parser("got %02x\n", *p);
-#endif
-
 		/* clear rest of line if EOL or EOF */
 		if (*p == '\0' || *p == '\n') {
-			debug_parser("filling up line\n");
 			if (*p == '\n')
 				p++;
 			while (col < TT_NCOLS) {
@@ -216,16 +171,9 @@ parse(const char *html, struct ttpage *page)
 
 		/* unescape hex escapes, used for block drawing characters */
 		if (!strncmp("&#x", p, 3)) {
-			debug_parser("skipping hex character\n");
 			wc = (wchar_t)strtol(p+3, (char **)&p, 16);
 			if (!*p)
 				p++; /* skip the ';' */
-#if DEBUG_PARSER
-			if (isprint(*p))
-				debug_parser("now got '%c'\n", wc);
-			else
-				debug_parser("now got %02x\n", wc);
-#endif
 		} else {
 			wc = *p;
 		}
@@ -234,23 +182,13 @@ parse(const char *html, struct ttpage *page)
 		case PS_IN_TEXT:
 			switch (wc) {
 			case '<':
-				debug_parser("-> PS_IN_TAG\n");
 				state = PS_IN_TAG;
-				debug_parser("pushing curattrs\n");
-				if (++attrdepth < LEN(attrstack)) {
+				if (++attrdepth < LEN(attrstack))
 					attrstack[attrdepth] = curattrs;
-					debug_parser("curattrs[%i] = %x %x\n",
-					    attrdepth, curattrs.fg,
-					    curattrs.bg);
-				}
 				break;
 			default:
 				/* ignore input beyond line length */
-				if (col >= TT_NCOLS) {
-					debug_parser("skipping, past EOL\n");
-				} else {
-					debug_parser("assigning %i,%i\n",
-					    line, col);
+				if (col < TT_NCOLS) {
 					page->chars[line][col] = wc;
 					page->attrs[line][col] = curattrs;
 					col++;
@@ -265,23 +203,16 @@ parse(const char *html, struct ttpage *page)
 				/* End tag, pop attrs. Twice, because we just
 				   pushed on the start of this closing tag
 				   too. */
-				debug_parser("popping curattrs (2x)\n");
 				if ((attrdepth -= 2) < 0)
 					attrdepth = 0;
-				else if (attrdepth < LEN(attrstack)) {
+				else if (attrdepth < LEN(attrstack))
 					curattrs = attrstack[attrdepth+1];
-					debug_parser("curattrs[%i] = %x %x\n",
-					    attrdepth+1, curattrs.fg,
-					    curattrs.bg);
-				}
 				break;
 			case '"':
-				debug_parser("-> PS_IN_ATTRQUOTES\n");
 				state = PS_IN_ATTRQUOTES;
 				openquote = p;
 				break;
 			case '>':
-				debug_parser("-> PS_IN_TEXT\n");
 				state = PS_IN_TEXT;
 				break;
 			}
@@ -290,18 +221,15 @@ parse(const char *html, struct ttpage *page)
 		case PS_IN_ATTRQUOTES:
 			switch (wc) {
 			case '"':
-				debug_parser("-> PS_IN_TAG\n");
 				state = PS_IN_TAG;
 				closequote = p;
 				break;
 			case '>':
-				debug_parser("-> PS_IN_TEXT\n");
 				state = PS_IN_TEXT;
 				closequote = p;
 				break;
 			}
 			if (state != PS_IN_ATTRQUOTES) {
-				debug_parser("parsing color\n");
 				/* we assume the attribute is 'class', so
 				   parse the colors */
 				parsecolors(openquote+1, closequote,
@@ -344,8 +272,6 @@ tt_get(const char *id, struct ttpage *page)
 		goto cleanup;
 	}
 
-	debug_io("fetching %s\n", url);
-	
 	curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curlerrbuf);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, USERAGENT);
 	curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -397,9 +323,6 @@ tt_get(const char *id, struct ttpage *page)
 	}
 
 	parse(html, page);
-
-	debug_io("parsed, id=%s nextsub=%s nextnum=%s\n", page->id,
-	    page->nextsub, page->nextpage);
 
 	for (line = 0; line < TT_NLINES; line++) {
 		for (col = 0; col < TT_NCOLS; col++) {
