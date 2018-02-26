@@ -74,7 +74,7 @@ main(int argc, char **argv)
 
 	setlocale(LC_ALL, "");
 
-	while ((c = getopt(argc, argv, "cu")) != -1) {
+	while ((c = getopt(argc, argv, "c")) != -1) {
 		switch (c) {
 		case 'c':
 			colorflag = 1;
