@@ -250,18 +250,16 @@ parsecolors(const char *str, const char *end, struct ttattrs *attrs)
 /* Very simple HTML parser. Only accepts the following sort of input:
 
      <span class="red bg-white">NOS</span> TELETEKST
-     Nieuws  <span class="cyan">101</span>
-     Sport   <span class="cyan">102</span>
+     Nieuws  <span class="cyan"><a href="#101">101</a></span>
+     Sport   <span class="cyan"><a href="#102">102</a></span>
 
    Every cell in the page is assigned, either with content, or with a space
    character.
 
    HTML element and attribute names themselves are ignored; if a tag contains
    quotes it is assumed to be a class list. Any tag with a '/' in it is
-   considered a closing tag. Nested spans are not supported.
-
-   An attempt is done to map 6-cell drawing characters to 4-cell Unicode
-   equivalents.
+   considered a closing tag. Nesting is supported, but no self-closing tags
+   and such.
 
    This may all seem horribly limited but it's only meant to parse the HTML
    output from the API, which it does. */
@@ -276,6 +274,10 @@ parse(const char *html, struct ttpage *page)
 	const char	*closequote	= NULL;
 	enum parsest	 state		= PS_IN_TEXT;
 	struct ttattrs	 curattrs	= defattrs;
+	struct ttattrs	 attrstack[8];
+	int		 attrdepth	= 0;
+
+	attrstack[0] = defattrs;
 
 #if DEBUG_HTML
 	puts(html);
@@ -327,6 +329,13 @@ parse(const char *html, struct ttpage *page)
 			case '<':
 				debug_parser("-> PS_IN_TAG\n");
 				state = PS_IN_TAG;
+				debug_parser("pushing curattrs\n");
+				if (++attrdepth < LEN(attrstack)) {
+					attrstack[attrdepth] = curattrs;
+					debug_parser("curattrs[%i] = %x %x\n",
+					    attrdepth, curattrs.fg,
+					    curattrs.bg);
+				}
 				break;
 			default:
 				/* ignore input beyond line length */
@@ -346,9 +355,18 @@ parse(const char *html, struct ttpage *page)
 		case PS_IN_TAG:
 			switch (wc) {
 			case '/':
-				/* end tag, reset color attributes */
-				debug_parser("resetting curattrs\n");
-				curattrs = defattrs;
+				/* End tag, pop attrs. Twice, because we just
+				   pushed on the start of this closing tag
+				   too. */
+				debug_parser("popping curattrs (2x)\n");
+				if ((attrdepth -= 2) < 0)
+					attrdepth = 0;
+				else if (attrdepth < LEN(attrstack)) {
+					curattrs = attrstack[attrdepth+1];
+					debug_parser("curattrs[%i] = %x %x\n",
+					    attrdepth+1, curattrs.fg,
+					    curattrs.bg);
+				}
 				break;
 			case '"':
 				debug_parser("-> PS_IN_ATTRQUOTES\n");
