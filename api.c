@@ -17,9 +17,6 @@
 
 #define LEN(a) (sizeof(a)/sizeof(*(a)))
 
-const char *tt_useragent	= "nostt";
-const char *tt_endpoint		= "http://teletekst-data.nos.nl/json/";
-
 enum parsest {
 	PS_IN_TEXT,
 	PS_IN_TAG,
