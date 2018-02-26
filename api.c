@@ -15,7 +15,7 @@
 enum parsest {
 	PS_IN_TEXT,
 	PS_IN_TAG,
-	PS_IN_ATTRQUOTES,
+	PS_IN_ATTRQUOTES
 };
 
 /* see jsonwrite() below */
@@ -59,7 +59,8 @@ jsonwrite(char *ptr, size_t sz, size_t nmemb, struct jsonctx *ctx)
 		return 0;
 	}
 
-	ctx->object = json_tokener_parse_ex(ctx->tokener, ptr, sz * nmemb);
+	ctx->object = json_tokener_parse_ex(ctx->tokener, ptr,
+	    (int)(sz * nmemb));
 	if (!ctx->object) {
 		jsonerr = json_tokener_get_error(ctx->tokener);
 		if (jsonerr != json_tokener_continue)
@@ -73,12 +74,12 @@ jsonwrite(char *ptr, size_t sz, size_t nmemb, struct jsonctx *ctx)
 static void
 parsecolor(const char *str, const char *end, enum ttcolor *color)
 {
-	int	i;
-	size_t	len;
+	size_t	i, len;
 
 	for (i = 0; i < LEN(colornames); i++) {
 		len = strlen(colornames[i]);
-		if (len >= end - str && !strncmp(str, colornames[i], len)) {
+		if ((ptrdiff_t)len >= end - str &&
+		    !strncmp(str, colornames[i], len)) {
 			*color = (enum ttcolor)i;
 			return;
 		}
@@ -173,7 +174,7 @@ parse(const char *html, struct ttpage *page)
 			switch (wc) {
 			case '<':
 				state = PS_IN_TAG;
-				if (++attrdepth < LEN(attrstack))
+				if (++attrdepth < (int)LEN(attrstack))
 					attrstack[attrdepth] = curattrs;
 				break;
 			default:
@@ -195,7 +196,7 @@ parse(const char *html, struct ttpage *page)
 				   too. */
 				if ((attrdepth -= 2) < 0)
 					attrdepth = 0;
-				else if (attrdepth < LEN(attrstack))
+				else if (attrdepth < (int)LEN(attrstack))
 					curattrs = attrstack[attrdepth+1];
 				break;
 			case '"':
