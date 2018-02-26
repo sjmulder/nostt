@@ -1,4 +1,4 @@
-#define USAGE	"usage: nostt [-ci] page[-subpage]"
+#define USAGE	"usage: nostt [-ci] [page[-subpage]]"
 
 #define _WITH_GETLINE
 
@@ -121,10 +121,13 @@ main(int argc, char **argv)
 	argc -= optind;
 	argv += optind;
 
-	if (argc != 1 || !*argv[0])
+	if (argc > 1)
 		errx(1, USAGE);
+	else if (argc)
+		id = argv[0];
+	else
+		id = "100";
 
-	id = argv[0];
 	while (1) {
 		ret = tt_get(id, &page);
 		if (ret != TT_OK)
