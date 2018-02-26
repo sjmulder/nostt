@@ -125,8 +125,8 @@ main(int argc, char **argv)
 		id = argv[0];
 	else if (argc || !interactive)
 		errx(1, USAGE);
-	else if (!(id = prompt("100")))
-		return 0;
+	else
+		id = "100";
 
 	while (1) {
 		ret = tt_get(id, &page);
