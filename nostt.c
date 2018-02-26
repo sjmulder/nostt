@@ -3,7 +3,7 @@
 
 #define ENABLE_COLOR	1
 
-#define USAGE		"usage: nostt [-cu] <page>"
+#define USAGE		"usage: nostt [-c] <page>"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -90,20 +90,15 @@ main(int argc, char **argv)
 	int		 c;
 	struct ttpage 	 page;
 	enum tterr	 ret;
-	struct ttgetopts getopts;
 	int		 colorflag = 0;
 	int		 line, col;
 
 	setlocale(LC_ALL, "");
 
-	memset(&getopts, 0, sizeof(getopts));
 	while ((c = getopt(argc, argv, "cu")) != -1) {
 		switch (c) {
 		case 'c':
 			colorflag = 1;
-			break;
-		case 'u':
-			getopts.mapmode = TT_MUNICODE;
 			break;
 		default:
 			errx(1, USAGE);
@@ -118,7 +113,7 @@ main(int argc, char **argv)
 
 	id = argv[0];
 	while (*id) {
-		ret = tt_get(id, &page, &getopts);
+		ret = tt_get(id, &page);
 		if (ret != TT_OK)
 			errx(1, "%s", tt_errstr(ret));
 

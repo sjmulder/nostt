@@ -2,6 +2,8 @@
 #define DEBUG_HTML	0
 #define DEBUG_PARSER	0
 
+#define USERAGENT	"nostt"
+#define ENDPOINT	"http://teletekst-data.nos.nl/json/"
 #define SUBST_CHAR	'%'
 
 #include <stdio.h>
@@ -66,11 +68,6 @@ static const struct ttattrs defattrs = {
 	/* bg */	TT_BLACK
 };
 
-static const struct ttgetopts defopts = {
-	/* useragent */	"nostt",
-	/* endpoint */	"http://teletekst-data.nos.nl/json/",
-	/* mapmode */	TT_MDEFAULT
-};
 
 /* Callback for curl; directly forwards data to the JSON parser. */
 static size_t
@@ -99,96 +96,6 @@ jsonwrite(char *ptr, size_t sz, size_t nmemb, struct jsonctx *ctx)
 	}
 
 	return sz * nmemb;
-}
-
-/* See the note above ttmapmode in api.h for an explanation */
-static wchar_t
-mapboxchar(wchar_t wc, enum ttmapmode mode)
-{
-	switch (mode) {
-	case TT_MASCII:
-		return wc > 0x7F ? SUBST_CHAR : wc;
-	case TT_MUNICODE:
-		break; /* continue below */
-	case TT_MNONE:
-	default:
-		return wc;
-	}
-
-	/* For the basic conversion case, we simply strip out the middle of
-	   the three rows . For a few special cases (marked '!') we deviate
-	   and use a different mapping because the middle row is very
-	   important (e.g. for '.. xx ..'). */
-
-	switch (wc) {
-	case 0xF020: return L' ';
-	case 0xF021: return 0x2598; /* x. .. .. -> x. .. */
-	case 0xF022: return 0x259D; /* .x .. .. -> .x .. */
-	case 0xF023: return 0x2580; /* xx .. .. -> xx .. */
-	case 0xF024: return L' ';   /* .. x. .. -> .. .. */
-	case 0xF025: return 0x2598; /* x. x. .. -> x. .. */
-	case 0xF026: return 0x259D; /* .x x. .. -> .x .. */
-	case 0xF027: return 0x2580; /* xx x. .. -> xx .. */
-	case 0xF028: return L' ';   /* .. .x .. -> .. .. */
-	case 0xF029: return 0x2598; /* x. .x .. -> x. .. */
-	case 0xF02A: return 0x259D; /* .x .x .. -> .x .. */
-	case 0xF02B: return 0x2580; /* xx .x .. -> xx .. */
-	case 0xF02C: return 0x2584; /* .. xx .. -> .. xx   ! */
-	case 0xF02D: return 0x2599; /* x. xx .. -> x. xx   ! */
-	case 0xF02E: return 0x259F; /* .x xx .. -> .x xx   ! */
-	case 0xF02F: return 0x2588; /* xx xx .. -> xx xx   ! */
-	case 0xF030: return L' ';   /* .. .. x. -> .. .. */
-	case 0xF031: return 0x2598; /* x. .. x. -> x. .. */
-	case 0xF032: return 0x259D; /* .x .. x. -> .x .. */
-	case 0xF033: return 0x2580; /* xx .. x. -> xx .. */
-	case 0xF034: return 0x2596; /* .. x. x. -> .. x. */
-	case 0xF035: return 0x258C; /* x. x. x. -> x. x. */
-	case 0xF036: return 0x259E; /* .x x. x. -> .x x. */
-	case 0xF037: return 0x259B; /* xx x. x. -> xx x. */
-	case 0xF038: return 0x2596; /* .. .x x. -> .. x. */
-	case 0xF039: return 0x258C; /* x. .x x. -> x. x. */
-	case 0xF03A: return 0x259E; /* .x .x x. -> .x x. */
-	case 0xF03B: return 0x259B; /* xx .x x. -> xx x. */
-	case 0xF03C: return 0x2596; /* .. xx x. -> .. x. */
-	case 0xF03D: return 0x258C; /* x. xx x. -> x. x. */
-	case 0xF03E: return 0x259E; /* .x xx x. -> .x x. */
-	case 0xF03F: return 0x259B; /* xx xx x. -> xx x. */
-	/* 0x20 sized gap */
-	case 0xF060: return 0x2597; /* .. .. .x -> .. .x */
-	case 0xF061: return 0x259A; /* x. .. .x -> x. .x */
-	case 0xF062: return 0x2590; /* .x .. .x -> .x .x */
-	case 0xF063: return 0x259C; /* xx .. .x -> xx .x */
-	case 0xF064: return 0x2597; /* .. x. .x -> .. .x */
-	case 0xF065: return 0x259A; /* x. x. .x -> x. .x */
-	case 0xF066: return 0x2590; /* .x x. .x -> .x .x */
-	case 0xF067: return 0x259C; /* xx x. .x -> xx .x */
-	case 0xF068: return 0x2597; /* .. .x .x -> .. .x */
-	case 0xF069: return 0x259A; /* x. .x .x -> x. .x */
-	case 0xF06A: return 0x2590; /* .x .x .x -> .x .x */
-	case 0xF06B: return 0x259C; /* xx .x .x -> xx .x */
-	case 0xF06C: return 0x2597; /* .. xx .x -> .. .x */
-	case 0xF06D: return 0x259A; /* x. xx .x -> x. .x */
-	case 0xF06E: return 0x2590; /* .x xx .x -> .x .x */
-	case 0xF06F: return 0x259C; /* xx xx .x -> xx .x */
-	case 0xF070: return 0x2584; /* .. .. xx -> .. xx */
-	case 0xF071: return 0x2599; /* x. .. xx -> x. xx */
-	case 0xF072: return 0x259F; /* .x .. xx -> .x xx */
-	case 0xF073: return 0x2588; /* xx .. xx -> xx xx */
-	case 0xF074: return 0x2584; /* .. x. xx -> .. xx */
-	case 0xF075: return 0x2599; /* x. x. xx -> x. xx */
-	case 0xF076: return 0x259F; /* .x x. xx -> .x xx */
-	case 0xF077: return 0x2588; /* xx x. xx -> xx xx */
-	case 0xF078: return 0x2584; /* .. .x xx -> .. xx */
-	case 0xF079: return 0x2599; /* x. .x xx -> x. xx */
-	case 0xF07A: return 0x259F; /* .x .x xx -> .x xx */
-	case 0xF07B: return 0x2584; /* xx .x xx -> xx xx */
-	case 0xF07C: return 0x2584; /* .. xx xx -> .. xx */
-	case 0xF07D: return 0x2599; /* x. xx xx -> x. xx */
-	case 0xF07E: return 0x259F; /* .x xx xx -> .x xx */
-	case 0xF07F: return 0x2588; /* xx xx xx -> xx xx */
-	}
-
-	return wc;
 }
 
 /* does nothing if no match */
@@ -410,7 +317,7 @@ parse(const char *html, struct ttpage *page)
 }
 
 enum tterr
-tt_get(const char *id, struct ttpage *page, const struct ttgetopts *opts)
+tt_get(const char *id, struct ttpage *page)
 {
 	enum tterr		 err	= TT_OK;
 	char			 url[128];
@@ -427,12 +334,7 @@ tt_get(const char *id, struct ttpage *page, const struct ttgetopts *opts)
 
 	memset(&json, 0, sizeof(json));
 
-	if (!opts)
-		opts = &defopts;
-
-	snprintf(url, LEN(url), "%s%s",
-	    opts->endpoint ? opts->endpoint : defopts.endpoint,
-	    id);
+	snprintf(url, LEN(url), ENDPOINT "%s", id);
 	url[LEN(url)-1] = '\0';
 
 	json.tokener = json_tokener_new();
@@ -445,8 +347,7 @@ tt_get(const char *id, struct ttpage *page, const struct ttgetopts *opts)
 	debug_io("fetching %s\n", url);
 	
 	curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curlerrbuf);
-	curl_easy_setopt(curl, CURLOPT_USERAGENT,
-	    opts->useragent ? opts->useragent : defopts.useragent);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, USERAGENT);
 	curl_easy_setopt(curl, CURLOPT_URL, url);
 	curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "application/json");
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, jsonwrite);
@@ -503,7 +404,10 @@ tt_get(const char *id, struct ttpage *page, const struct ttgetopts *opts)
 	for (line = 0; line < TT_NLINES; line++) {
 		for (col = 0; col < TT_NCOLS; col++) {
 			wcp = &page->chars[line][col];
-			*wcp = mapboxchar(*wcp, opts->mapmode);
+
+			/* Map block drawing characters */
+			if (*wcp >= 0xF000)
+				*wcp = SUBST_CHAR;	
 		}
 	}
 
