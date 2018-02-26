@@ -1,4 +1,4 @@
-#define USAGE	"usage: nostt [-ci] [page[-subpage]]"
+#define USAGE	"usage: nostt [-ci] page[-subpage]"
 
 #define _WITH_GETLINE
 
@@ -64,8 +64,8 @@ putcell_color(struct ttpage *page, int line, int col)
 	printf("%lc", wc);
 }
 
-static char *
-prompt(char *suggestion)
+static const char *
+prompt(const char *suggestion)
 {
 	static char	*input = NULL;
 	static ssize_t	 len;
@@ -121,12 +121,12 @@ main(int argc, char **argv)
 	argc -= optind;
 	argv += optind;
 
-	if (argc > 1)
-		errx(1, USAGE);
-	else if (argc)
+	if (argc == 1)
 		id = argv[0];
-	else
-		id = "100";
+	else if (argc || !interactive)
+		errx(1, USAGE);
+	else if (!(id = prompt("100")))
+		return 0;
 
 	while (1) {
 		ret = tt_get(id, &page);
