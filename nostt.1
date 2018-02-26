@@ -1,0 +1,47 @@
+.Dd Feb 26, 2018
+.Dt NOSTT 1
+.Os
+.Sh NAME
+.Nm nostt
+.Nd command line NOS Teletekst reader
+.Sh SYNOPSIS
+.Nm
+.Op Fl ic
+.Op Ar page
+.Sh DESCRIPTION
+Displays the requested NOS Teletekst page on the command line.
+Pages are identified by a three-digit number optionally followed by a subpage,
+for example 100 or 302-2.
+.Pp
+The
+.Ar page
+argument is required unless using interactive mode.
+When a subpage is given,
+.Nm
+prints only that subpage.
+Otherwise, all subpages are printed.
+.Ss Options
+.Bl -tag -width Ds
+.It Fl i
+Run in interactive mode.
+A prompt will appear after every page,
+asking for the next page to display.
+Exit by sending an interrupt signal (usually Ctrl+C).
+.It Fl c
+Enable color output.
+.El
+.Ss Teletext graphics
+Teletext supports 6-cell (2x3) block drawing characters.
+The NOS viewer and API use a custom font with these characters in the
+.Qq private use
+0xF000 Unicode range.
+.Pp
+Because such characters are not usually available on terminals,
+they are replaced by
+.Li %
+characaters.
+.Sh SEE ALSO
+.Lk https://github.com/sjmulder/nostt
+.Sh AUTHORS
+.An Sijmen J. Mulder
+.Aq Mt ik@sjmulder.nl .
