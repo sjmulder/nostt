@@ -27,6 +27,11 @@ struct jsonctx {
 	struct json_object	*object;
 };
 
+struct entity {
+	char	seq[10];
+	wchar_t	wc;
+};
+
 static char curlerrbuf[CURL_ERROR_SIZE];
 
 /* indexed by ttcolor */
@@ -39,6 +44,45 @@ static const char *colornames[] = {
 	"magenta",
 	"yellow",
 	"white"
+};
+
+static const struct entity entities[] = {
+	/* HTMLspecial */
+	{ "&qout;",	0x22 }, { "&amp;",	0x26 },
+	{ "&apos;",	0x27 }, { "&lt;",	0x3C },
+	{ "&gt;",	0x3E },
+	/* HTMLlat1 */
+	{ "&AElig;",	0xC6 }, { "&Aacute;",	0xC1 },
+	{ "&Acirc;",	0xC2 }, { "&Agrave;",	0xC0 },
+	{ "&Aring;",	0xC5 }, { "&Atilde;",	0xC3 },
+	{ "&Auml;",	0xC4 }, { "&Ccedil;",	0xC7 },
+	{ "&ETH;",	0xD0 }, { "&Eacute;",	0xC9 },
+	{ "&Ecirc;",	0xCA }, { "&Egrave;",	0xC8 },
+	{ "&Euml;",	0xCB }, { "&Iacute;",	0xCD },
+	{ "&Icirc;",	0xCE }, { "&Igrave;",	0xCC },
+	{ "&Iuml;",	0xCF }, { "&Ntilde;",	0xD1 },
+	{ "&Oacute;",	0xD3 }, { "&Ocirc;",	0xD4 },
+	{ "&Ograve;",	0xD2 }, { "&Oslash;",	0xD8 },
+	{ "&Otilde;",	0xD5 }, { "&Ouml;",	0xD6 },
+	{ "&THORN;",	0xDE }, { "&Uacute;",	0xDA },
+	{ "&Ucirc;",	0xDB }, { "&Ugrave;",	0xD9 },
+	{ "&Uuml;",	0xDC }, { "&Yacute;",	0xDD },
+	{ "&aacute;",	0xE1 }, { "&acirc;",	0xE2 },
+	{ "&aelig;",	0xE6 }, { "&agrave;",	0xE0 },
+	{ "&aring;",	0xE5 }, { "&atilde;",	0xE3 },
+	{ "&auml;",	0xE4 }, { "&ccedil;",	0xE7 },
+	{ "&eacute;",	0xE9 }, { "&ecirc;",	0xEA },
+	{ "&egrave;",	0xE8 }, { "&eth;",	0xF0 },
+	{ "&euml;",	0xEB }, { "&iacute;",	0xED },
+	{ "&icirc;",	0xEE }, { "&igrave;",	0xEC },
+	{ "&iuml;",	0xEF }, { "&ntilde;",	0xF1 },
+	{ "&oacute;",	0xF3 }, { "&ocirc;",	0xF4 },
+	{ "&ograve;",	0xF2 }, { "&oslash;",	0xF8 },
+	{ "&otilde;",	0xF5 }, { "&ouml;",	0xF6 },
+	{ "&szlig;",	0xDF }, { "&thorn;",	0xFE },
+	{ "&uacute;",	0xFA }, { "&ucirc;",	0xFB },
+	{ "&ugrave;",	0xF9 }, { "&uuml;",	0xFC },
+	{ "&yacute;",	0xFD }, { "&yuml;",	0xFF }
 };
 
 static const struct ttattrs defattrs = {
@@ -86,6 +130,40 @@ parsecolor(const char *str, const char *end, enum ttcolor *color)
 			return;
 		}
 	}
+}
+
+/* Unescapes HTML entities. *endp will point to the first character past the
+   escape sequence. */
+static wchar_t
+unescape(const char *sequence, const char **endp)
+{
+	wchar_t	wc;
+	size_t	len, i;
+
+	if (*sequence != '&') {
+		/* assign wc first in case sequence=*endp */
+		wc = *sequence;
+		*endp = sequence + 1;
+		return wc;
+	}
+
+	if (!strncmp("&#x", sequence, 3)) {
+		wc = (wchar_t)strtol(sequence+3, (char **)endp, 16);
+		if (**endp == ';')
+			(*endp)++;
+		return wc;
+	}
+
+	for (i = 0; i < LEN(entities); i++) {
+		len = strlen(entities[i].seq);
+		if (!strncmp(entities[i].seq, sequence, len)) {
+			*endp = sequence + len;
+			return entities[i].wc;
+		}
+	}
+
+	*endp = sequence + 1;
+	return '&';
 }
 
 /* parses class name lists like "red bg-white" into attrs->fg and attrs->bg,
@@ -163,11 +241,9 @@ parse(const char *html, struct ttpage *page)
 			continue;
 		}
 
-		/* unescape hex escapes, used for block drawing characters */
-		if (!strncmp("&#x", p, 3)) {
-			wc = (wchar_t)strtol(p+3, (char **)&p, 16);
-			if (!*p)
-				p++; /* skip the ';' */
+		if (*p == '&') {
+			wc = unescape(p, &p);
+			p--; /* offset the p++ later on */
 		} else
 			wc = *p;
 
