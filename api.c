@@ -7,12 +7,7 @@
 #include <ctype.h>
 #include <wchar.h>
 #include <curl/curl.h>
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-# include <json-c/json.h>
-#pragma clang diagnostic pop
-
+#include <json-c/json.h>
 #include "api.h"
 
 #define LEN(a) (sizeof(a)/sizeof(*(a)))
