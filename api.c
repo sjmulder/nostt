@@ -268,8 +268,6 @@ tt_get(const char *id, struct ttpage *page)
 	curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "application/json");
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, jsonwrite);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &json);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, jsonwrite);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &json);
 
 	if (curl_easy_perform(curl) != CURLE_OK) {
 		err = TT_ECURL;
