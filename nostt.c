@@ -43,6 +43,14 @@ mapbg(enum ttcolor c)
 	}
 }
 
+static int
+enveq(const char *name, const char *val)
+{
+	char	*actual;
+
+	return (actual = getenv(name)) && strcmp(actual, val) == 0;
+}
+
 static void
 putcell_color(struct ttpage *page, int line, int col)
 {
@@ -101,11 +109,15 @@ main(int argc, char **argv)
 	int		 c;
 	struct ttpage 	 page;
 	enum tterr	 ret;
-	int		 colorflag	= 0;
+	int		 colorflag;
 	int		 interactive	= 0;
 	int		 line, col;
 
 	setlocale(LC_ALL, "");
+
+	colorflag =
+	    enveq("CLICOLOR_FORCE", "1") ||
+	    (isatty(STDOUT_FILENO) && enveq("CLICOLOR", "1"));
 
 	while ((c = getopt(argc, argv, "ci")) != -1) {
 		switch (c) {

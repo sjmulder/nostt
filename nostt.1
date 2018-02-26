@@ -29,6 +29,14 @@ asking for the next page to display.
 Exit by sending an interrupt signal (usually Ctrl+C).
 .It Fl c
 Enable color output.
+Default if standard output is a terminal and
+.Ev CLICOLOR
+is set to
+.Li 1 ,
+or if
+.Ev CLICOLOR_FORCE
+is set to
+.Li 1 .
 .El
 .Ss Teletext graphics
 Teletext supports 6-cell (2x3) block drawing characters.
