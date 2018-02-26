@@ -1,4 +1,6 @@
-#define USAGE	"usage: nostt [-c] page[-subpage]"
+#define USAGE	"usage: nostt [-ci] page[-subpage]"
+
+#define _WITH_GETLINE
 
 #include <unistd.h>
 #include <stdio.h>
@@ -62,6 +64,34 @@ putcell_color(struct ttpage *page, int line, int col)
 	printf("%lc", wc);
 }
 
+static char *
+prompt(char *suggestion)
+{
+	static char	*input = NULL;
+	static ssize_t	 len;
+	static size_t	 cap;
+
+	while (1) {
+		if (suggestion)
+			printf("page [%s]? ", suggestion);
+		else
+			printf("page? ");
+
+		if ((len = getline(&input, &cap, stdin)) == -1)
+			return NULL;
+		else if (!len) {
+			if (suggestion)
+				return suggestion;
+		} else if (input[len-1] == '\n') {
+			input[--len] = '\0';
+			if (len)
+				return input;
+			else if (suggestion)
+				return suggestion;
+		}
+	}
+}
+
 int
 main(int argc, char **argv)
 {
@@ -69,15 +99,19 @@ main(int argc, char **argv)
 	int		 c;
 	struct ttpage 	 page;
 	enum tterr	 ret;
-	int		 colorflag = 0;
+	int		 colorflag	= 0;
+	int		 interactive	= 0;
 	int		 line, col;
 
 	setlocale(LC_ALL, "");
 
-	while ((c = getopt(argc, argv, "c")) != -1) {
+	while ((c = getopt(argc, argv, "ci")) != -1) {
 		switch (c) {
 		case 'c':
 			colorflag = 1;
+			break;
+		case 'i':
+			interactive = 1;
 			break;
 		default:
 			errx(1, USAGE);
@@ -91,7 +125,7 @@ main(int argc, char **argv)
 		errx(1, USAGE);
 
 	id = argv[0];
-	while (*id) {
+	while (1) {
 		ret = tt_get(id, &page);
 		if (ret != TT_OK)
 			errx(1, "%s", tt_errstr(ret));
@@ -102,17 +136,24 @@ main(int argc, char **argv)
 					putcell_color(&page, line, col);
 				puts("\e[0m");
 			}
-		} else
+		} else {
 			for (line = 0; line < TT_NLINES; line++)
 				printf("%.*ls\n", TT_NCOLS, page.chars[line]);
+		}
 
-		/* If a subpage was requested (e.g. 101-2), don't print any
-		   further pages. */
-		if (id == argv[0] && strchr(id, '-'))
-			break;
-
-		putchar('\n');
-		id = page.nextsub;
+		if (interactive) {
+			putchar('\n');
+			id = prompt(*page.nextsub ? page.nextsub : NULL);
+			if (!id)
+				return 0;
+		} else if (id == argv[0] && strchr(id, '-')) {
+			/* Only print requested subpage */
+			return 0;
+		} else if (*page.nextsub) {
+			putchar('\n');
+			id = page.nextsub;
+		} else
+			return 0;
 	}
 
 	return 0;
