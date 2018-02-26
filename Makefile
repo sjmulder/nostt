@@ -1,4 +1,4 @@
-CFLAGS  += -ansi -Wall -Dinline= -D_XOPEN_SOURCE=500
+CFLAGS  += -Wall
 LDFLAGS +=
 LDLIBS   = -lcurl -ljson-c
 
