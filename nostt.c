@@ -1,6 +1,6 @@
 /* nostt.c - Copyright (c) 2018, Sijmen J. Mulder (see LICENSE.md) */
 
-#define USAGE	"usage: nostt [-ci] page[-subpage]"
+#define USAGE	"usage: nostt [-iG] page[-subpage]"
 
 #define _WITH_GETLINE
 
@@ -119,13 +119,13 @@ main(int argc, char **argv)
 	    enveq("CLICOLOR_FORCE", "1") ||
 	    (isatty(STDOUT_FILENO) && enveq("CLICOLOR", "1"));
 
-	while ((c = getopt(argc, argv, "ci")) != -1) {
+	while ((c = getopt(argc, argv, "iG")) != -1) {
 		switch (c) {
-		case 'c':
-			colorflag = 1;
-			break;
 		case 'i':
 			interactive = 1;
+			break;
+		case 'G':
+			colorflag = 1;
 			break;
 		default:
 			errx(1, USAGE);
