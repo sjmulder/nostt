@@ -130,8 +130,16 @@ main(int argc, char **argv)
 
 	while (1) {
 		ret = tt_get(id, &page);
-		if (ret != TT_OK)
-			errx(1, "%s", tt_errstr(ret));
+		if (ret != TT_OK) {
+			if (!interactive)
+				errx(1, "%s", tt_errstr(ret));
+
+			warnx("%s", tt_errstr(ret));
+			puts("(press ^C to exit)\n");
+			if (!(id = prompt(NULL)))
+				return 0;
+			continue;
+		}
 
 		if (colorflag) {
 			for (line = 0; line < TT_NLINES; line++) {
