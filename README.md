@@ -1,7 +1,7 @@
 nostt
 =====
 
-Command line NOS Teletekst reader
+Command line NOS Teletekst reader. Supports color and has an interactive mode.
 
 **nostt** [**-iG**] [*page*]
 
