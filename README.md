@@ -72,12 +72,12 @@ Installation
 
 **nostt** should work on most Unix-like systems. It depends on
 [libcurl](https://curl.haxx.se/libcurl/) and
-[json-c](https://github.com/json-c/json-c)
+[json-c](https://github.com/json-c/json-c).
 Once these are installed, modify the Makefile as desired. Then:
 
     make
 
-To install or uninstall, setting PREFIX as desired and switching to root if
+To install or uninstall, setting `PREFIX` as desired and switching to root if
 necessary:
 
     PREFIX=/usr/local make install
