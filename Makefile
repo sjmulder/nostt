@@ -2,7 +2,6 @@ CFLAGS  += -Wall -Wextra
 LDFLAGS +=
 LDLIBS   = -lcurl -ljson-c
 
-TARGET   = nostt
 OBJECTS  = nostt.o api.o
 PREFIX	?= /usr/local
 
