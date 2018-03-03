@@ -16,4 +16,4 @@ clean:
 nostt.o: api.h
 api.o:   api.h
 
-.PHONY: all clean install uninstall
+.PHONY: all clean
