@@ -67,8 +67,8 @@ and API use a custom font with these characters in the "private use"
 Because such characters are not usually available on terminals, they are
 replaced by `%` characaters.
 
-Installation
-------------
+Building
+--------
 
 **nostt** should work on most Unix-like systems. It depends on
 [libcurl](https://curl.haxx.se/libcurl/) and
@@ -76,12 +76,6 @@ Installation
 Once these are installed, modify the Makefile as desired. Then:
 
     make
-
-To install or uninstall, setting `PREFIX` as desired and switching to root if
-necessary:
-
-    PREFIX=/usr/local make install
-    PREFIX=/usr/local make uninstall
 
 Links
 -----
