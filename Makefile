@@ -10,9 +10,6 @@ all: nostt
 nostt: $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LDLIBS)
 
-test: nostt
-	./nostt -G 100 >/dev/null
-
 clean:
 	rm -f *.o nostt
 
