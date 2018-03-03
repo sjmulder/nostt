@@ -1,13 +1,10 @@
 CFLAGS  += -Wall -Wextra
-LDFLAGS +=
 LDLIBS   = -lcurl -ljson-c
-
-OBJECTS  = nostt.o api.o
 
 all: nostt
 
-nostt: $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LDLIBS)
+nostt: nostt.o api.o
+	$(CC) $(LDFLAGS) -o $@ nostt.o api.o $(LDLIBS)
 
 clean:
 	rm -f *.o nostt
