@@ -23,12 +23,12 @@ Command line NOS Teletekst reader. Supports color and has an interactive mode.
                                             
      Mies Bouwman (88) overleden........ 112
      "Koningin van de tv overleden"..... 113
-     Nederlandse olympiërs gehuldigd.... 114
+     Nederlandse olympiers gehuldigd.... 114
     %%%%%%%%%%%%%% kort nieuws%%%%%%%%%%%%%%
      Treinverkeer A'dam kort ontregeld.. 121
      Vogelgriep op bedrijf in Groningen. 121
      Meisje mishandeld om hoofddoek..... 122
-     Nederlandse skiër (50) verongelukt. 122
+     Nederlandse skier (50) verongelukt. 122
        ticker 199              politie 147  
                           NOS Teletekst 102 
 
