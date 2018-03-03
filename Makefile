@@ -3,7 +3,6 @@ LDFLAGS +=
 LDLIBS   = -lcurl -ljson-c
 
 OBJECTS  = nostt.o api.o
-PREFIX	?= /usr/local
 
 all: nostt
 
