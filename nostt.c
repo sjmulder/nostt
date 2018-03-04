@@ -150,6 +150,4 @@ main(int argc, char **argv)
 		} else
 			return 0;
 	}
-
-	return 0;
 }
