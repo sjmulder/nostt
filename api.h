@@ -6,12 +6,12 @@
 /* 3 color RGB */
 enum ttcolor {
 	TT_BLACK,
-	TT_BLUE,
-	TT_GREEN,
-	TT_CYAN,
 	TT_RED,
-	TT_MAGENTA,
+	TT_GREEN,
 	TT_YELLOW,
+	TT_BLUE,
+	TT_MAGENTA,
+	TT_CYAN,
 	TT_WHITE
 };
 

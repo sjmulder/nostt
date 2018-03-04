@@ -37,12 +37,12 @@ static char curlerrbuf[CURL_ERROR_SIZE];
 /* indexed by ttcolor */
 static const char *colornames[] = {
 	"black",
-	"blue",
-	"green",
-	"cyan",
 	"red",
-	"magenta",
+	"green",
 	"yellow",
+	"blue",
+	"magenta",
+	"cyan",
 	"white"
 };
 
