@@ -2,16 +2,90 @@
 
 #define USAGE	"usage: nostt [-iG] [page]"
 
+#ifdef __MINGW32__
+# define COMPAT_ERR
+# define COMPAT_GETLINE
+#endif
+
 #define _WITH_GETLINE
 
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <wchar.h>
 #include <locale.h>
-#include <err.h>
 #include "api.h"
+
+#ifndef COMPAT_ERR
+# include <err.h>
+#endif
+
+static char *argv0;
+
+#ifdef COMPAT_ERR
+static void
+errx(int eval, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	fprintf(stderr, "%s ", argv0);
+	vfprintf(stderr, fmt, ap);
+	fputc('\n', stderr);
+	va_end(ap);
+
+	exit(eval);
+}
+
+static void
+warnx(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	fprintf(stderr, "%s ", argv0);
+	vfprintf(stderr, fmt, ap);
+	fputc('\n', stderr);
+	va_end(ap);
+}
+#endif
+
+#ifdef COMPAT_GETLINE
+static ssize_t
+getline(char **linep, size_t *linecapp, FILE *stream)
+{
+	size_t	len = 0;
+	int	ch;
+
+	fflush(stdout);
+
+	if (!*linep) {
+		*linecapp = 128;
+		if (!(*linep = malloc(*linecapp)))
+			return -1;
+	}
+
+	while (1) {
+		if (len+2 >= *linecapp) {
+			while (len+2 >= (*linecapp *= 2))
+				;
+			if (!(*linep = realloc(*linep, *linecapp)))
+				return -1;
+		}
+
+		ch = fgetc(stream);
+		if (ch != -1)
+			(*linep)[len++] = (int)ch;
+
+		if (ch == -1 || ch == '\n') {
+			(*linep)[len] = '\0';
+			return len;
+		}
+	}
+}
+#endif
 
 static int
 enveq(const char *name, const char *val)
@@ -83,6 +157,7 @@ main(int argc, char **argv)
 	int		 interactive	= 0;
 	int		 line, col;
 
+	argv0 = *argv;
 	setlocale(LC_ALL, "");
 
 	colorflag =
