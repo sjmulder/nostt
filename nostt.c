@@ -18,6 +18,10 @@
 #include <locale.h>
 #include "api.h"
 
+#ifdef _WIN32
+# include <windows.h>
+#endif
+
 #ifndef COMPAT_ERR
 # include <err.h>
 #endif
@@ -86,6 +90,19 @@ getline(char **linep, size_t *linecapp, FILE *stream)
 	}
 }
 #endif
+
+static void
+enablecolor()
+{
+#ifdef _WIN32
+	HANDLE	hout;
+	DWORD	mode	= 0;
+
+	hout = GetStdHandle(STD_OUTPUT_HANDLE);
+	GetConsoleMode(hout, &mode);
+	SetConsoleMode(hout, mode|4); /* ENABLE_VIRTUAL_TERMINAL_PROCESSING */
+#endif
+}
 
 static int
 enveq(const char *name, const char *val)
@@ -179,6 +196,9 @@ main(int argc, char **argv)
 
 	argc -= optind;
 	argv += optind;
+
+	if (colorflag)
+		enablecolor();
 
 	if (argc == 1)
 		id = argv[0];
