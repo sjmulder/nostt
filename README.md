@@ -55,6 +55,21 @@ Color ouptut is disabled by default in MinTTY on Windows. This is because
 MinTTY redirects standard output. Set `CLICOLOR_FORCE` to 1 to force color
 output.
 
+Ports and packages
+------------------
+**macOS**, with [Homebrew](https://brew.sh)
+([tap](https://github.com/sjmulder/homebrew-tap))
+
+    brew install sjmulder/tap/nostt
+
+**FreeBSD**,
+with [ports](https://www.freshports.org/multimedia/nostt/)
+or pkg:
+
+    pkg install nos-tt
+
+For other platforms, read on.
+
 Building
 --------
 **nostt** should work on most Unix-like systems, as well as on Windows through
