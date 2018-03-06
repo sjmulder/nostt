@@ -6,27 +6,22 @@
 .Nd command line NOS Teletekst reader
 .Sh SYNOPSIS
 .Nm
-.Op Fl iG
+.Op Fl G
 .Op Ar page
 .Sh DESCRIPTION
 Displays the requested NOS Teletekst page on the command line.
 Pages are identified by a three-digit number optionally followed by a subpage,
 for example 100 or 302-2.
+All subpages are printed if not specified.
 .Pp
-The
+If no
 .Ar page
-argument is required unless using interactive mode.
-When a subpage is given,
+argument is given,
 .Nm
-prints only that subpage.
-Otherwise, all subpages are printed.
-.Ss Options
+runs interactively.
+.Pp
+There is one supported option:
 .Bl -tag -width Ds
-.It Fl i
-Run in interactive mode.
-A prompt will appear after every page,
-asking for the next page to display.
-Exit by sending an interrupt signal (usually Ctrl+C).
 .It Fl G
 Enable color output.
 Default if standard output is a terminal and

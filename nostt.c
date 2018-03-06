@@ -1,6 +1,6 @@
 /* nostt.c - Copyright (c) 2018, Sijmen J. Mulder (see LICENSE.md) */
 
-#define USAGE	"usage: nostt [-iG] [page]"
+#define USAGE	"usage: nostt [-G] [page]"
 
 #ifdef __MINGW32__
 # define COMPAT_ERR
@@ -170,42 +170,40 @@ main(int argc, char **argv)
 	int		 c;
 	struct ttpage 	 page;
 	enum tterr	 ret;
-	int		 colorflag;
+	int		 colorflag	= 0;
 	int		 interactive	= 0;
 	int		 line, col;
 
 	argv0 = *argv;
 	setlocale(LC_ALL, "");
 
-	colorflag =
-	    enveq("CLICOLOR_FORCE", "1") ||
-	    (isatty(STDOUT_FILENO) && enveq("CLICOLOR", "1"));
-
-	while ((c = getopt(argc, argv, "iG")) != -1) {
+	while ((c = getopt(argc, argv, "G")) != -1) {
 		switch (c) {
-		case 'i':
-			interactive = 1;
-			break;
 		case 'G':
 			colorflag = 1;
 			break;
 		default:
-			errx(1, USAGE);
+			errx(1, USAGE, c);
 		}
 	}
 
 	argc -= optind;
 	argv += optind;
 
+	if (argc > 1)
+		errx(1, USAGE);
+
+	if (!(id = *argv)) {
+		id = "100";
+		interactive = 1;
+	}
+
+	if (!colorflag)
+		colorflag =
+		    enveq("CLICOLOR_FORCE", "1") ||
+		    (isatty(STDOUT_FILENO) && enveq("CLICOLOR", "1"));
 	if (colorflag)
 		enablecolor();
-
-	if (argc == 1)
-		id = argv[0];
-	else if (argc || !interactive)
-		errx(1, USAGE);
-	else
-		id = "100";
 
 	while (1) {
 		ret = tt_get(id, &page);
