@@ -324,6 +324,7 @@ tt_get(const char *id, struct ttpage *page)
 	const char		*html;
 	wchar_t			*wcp;
 	int			 line, col;
+	struct curl_slist	*list	= NULL;
 
 	if (!id || !*id || !page)
 		return TT_EARG;
@@ -343,14 +344,18 @@ tt_get(const char *id, struct ttpage *page)
 	curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curlerrbuf);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, USERAGENT);
 	curl_easy_setopt(curl, CURLOPT_URL, url);
-	curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "application/json");
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, jsonwrite);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &json);
+
+	list = curl_slist_append(list, "Accept-Encoding: application/json");
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 
 	if (curl_easy_perform(curl) != CURLE_OK) {
 		err = TT_ECURL;
 		goto cleanup;
 	}
+
+	curl_slist_free_all(list);
 
 	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
 	if (status < 200 || status >= 300) {
