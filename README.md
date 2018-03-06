@@ -1,7 +1,8 @@
 nostt
 =====
 
-Command line NOS Teletekst reader. Supports color and has an interactive mode.
+Command line NOS Teletekst reader for Unix-likes and Windows. Supports color
+and has an interactive mode.
 
 **nostt** [**-iG**] [*page*]
 
@@ -34,57 +35,36 @@ Command line NOS Teletekst reader. Supports color and has an interactive mode.
 
 Description
 -----------
+Displays the requested [NOS Teletekst](https://nos.nl/teletekst) page on the
+command line. Pages are identified by a three-digit number optionally followed
+by a subpage, for example 100 or 302-2. All subpages are printed if not
+specified.
 
-Displays the requested NOS Teletekst page on the command line. Pages are
-identified by a three-digit number optionally followed by a subpage, for
-example 100 or 302-2.
+If no *page* argument is given, nostt runs interactively.
 
-The *page* argument is required unless using interactive mode. When a
-subpage is given, nostt prints only that subpage. Otherwise, all
-subpages are printed.
+See the manual page for more details.
 
-Options
--------
+Known issues
+------------
+Teletext's 6-cell (2x3) block characters are displayed as % characters as they
+cannot be accurately reproduced in a terinal without special fonts. (The NOS
+viewer and API uses a custom font with these characters in the "private use"
+0xF000 Unicode range.)
 
-**-i**
-
-Run in interactive mode. A prompt will appear after every page,
-asking for the next page to display. Exit by sending an
-interrupt signal (usually Ctrl+C).
-
-**-G**
-
-Enable color output. Default if standard output is a terminal
-and `CLICOLOR` is set to `1`, or if `CLICOLOR_FORCE` is set to `1`.
-
-Teletext graphics
------------------
-
-Teletext supports 6-cell (2x3) block drawing characters. The NOS viewer
-and API use a custom font with these characters in the "private use"
-0xF000 Unicode range.
-
-Because such characters are not usually available on terminals, they are
-replaced by `%` characaters.
+Color ouptut is disabled by default in MinTTY on Windows. This is because
+MinTTY redirects standard output. Set `CLICOLOR_FORCE` to 1 to force color
+output.
 
 Building
 --------
-
-**nostt** should work on most Unix-like systems. It depends on
+**nostt** should work on most Unix-like systems, as well as on Windows through
+[MinGW](http://mingw-w64.org/doku.php) and such. It depends on
 [libcurl](https://curl.haxx.se/libcurl/) and
-[json-c](https://github.com/json-c/json-c).
-Once these are installed, modify the Makefile as desired. Then:
+[json-c](https://github.com/json-c/json-c). Once these are installed, modify
+the Makefile as desired. Then:
 
     make
 
-Links
------
-
-Project page: https://github.com/sjmulder/nostt
-
-Official NOS Teletekst web client: https://nos.nl/teletekst
-
 Authors
 -------
-
-Sijmen J. Mulder (<ik@sjmulder.nl>).
+Sijmen J. Mulder (<ik@sjmulder.nl>)
