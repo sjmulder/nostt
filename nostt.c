@@ -201,7 +201,7 @@ main(int argc, char **argv)
 	if (!colorflag)
 		colorflag =
 		    enveq("CLICOLOR_FORCE", "1") ||
-		    (isatty(STDOUT_FILENO) && enveq("CLICOLOR", "1"));
+		    (isatty(STDOUT_FILENO) && !enveq("CLICOLOR", "0"));
 	if (colorflag)
 		enablecolor();
 
