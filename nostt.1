@@ -6,7 +6,6 @@
 .Nd command line NOS Teletekst reader
 .Sh SYNOPSIS
 .Nm
-.Op Fl G
 .Op Ar page
 .Sh DESCRIPTION
 Displays the requested NOS Teletekst page on the command line.
@@ -20,29 +19,13 @@ argument is given,
 .Nm
 runs interactively.
 .Pp
-There is one supported option:
-.Bl -tag -width Ds
-.It Fl G
-Force color output,
-regardless of environment variables and output redirection.
-.El
-.Ss Teletext graphics
-Teletext supports 6-cell (2x3) block drawing characters.
-The NOS viewer and API use a custom font with these characters in the
-.Qq private use
-0xF000 Unicode range.
-.Pp
-Because such characters are not usually available on terminals,
-they are replaced by
-.Li %
-characaters.
 .Sh ENVIRONMENT
-.Ev CLICOLOR
-and
-.Ev CLICOLOR_FORCE
-are honored as described for the
-.Fl G
-option above.
+.Bl -tag -width LC_MONETARY
+.It Ev CLICOLOR
+When set to 0, color output is disabled.
+.It Ev CLICOLOR_FORCE
+When set to 1, color output is enabled even output is redirect to a pipe or
+file.
 .Sh SEE ALSO
 Project page:
 .Lk https://github.com/sjmulder/nostt
@@ -52,3 +35,16 @@ Official NOS Teletekst web client:
 .Sh AUTHORS
 .An Sijmen J. Mulder
 .Aq Mt ik@sjmulder.nl .
+.Sh BUGS
+Teletext's 6-cell (2x3) block characters are displayed as % characters
+as they cannot be accurately reproduced in a terinal without special fonts.
+(The NOS viewer and API uses a custom font with these characters in the
+.Qq private use
+0xF000 Unicode range.)
+.Pp
+Color ouptut is disabled by default in MinTTY in Windows.
+This is because MinTTY redirects standard output.
+Set
+.Ev
+CLICOLOR_FORCE
+to 1 to force color output.

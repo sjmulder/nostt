@@ -1,6 +1,6 @@
 /* nostt.c - Copyright (c) 2018, Sijmen J. Mulder (see LICENSE.md) */
 
-#define USAGE	"usage: nostt [-G] [page]"
+#define USAGE	"usage: nostt [page]"
 
 #ifdef __MINGW32__
 # define COMPAT_ERR
@@ -167,42 +167,31 @@ int
 main(int argc, char **argv)
 {
 	const char	*id;
-	int		 c;
 	struct ttpage 	 page;
 	enum tterr	 ret;
-	int		 colorflag	= 0;
+	int		 withcolor	= 0;
 	int		 interactive	= 0;
 	int		 line, col;
+
+	(void) argc;
 
 	argv0 = *argv;
 	setlocale(LC_ALL, "");
 
-	while ((c = getopt(argc, argv, "G")) != -1) {
-		switch (c) {
-		case 'G':
-			colorflag = 1;
-			break;
-		default:
-			errx(1, USAGE, c);
-		}
-	}
-
-	argc -= optind;
-	argv += optind;
-
-	if (argc > 1)
-		errx(1, USAGE);
-
-	if (!(id = *argv)) {
+	if (argv[1]) {
+		if (argv[2] || *argv[1] == '-')
+			errx(1, USAGE);
+		id = argv[1];
+	} else {
 		id = "100";
 		interactive = 1;
 	}
 
-	if (!colorflag)
-		colorflag =
-		    enveq("CLICOLOR_FORCE", "1") ||
-		    (isatty(STDOUT_FILENO) && !enveq("CLICOLOR", "0"));
-	if (colorflag)
+	withcolor =
+	    enveq("CLICOLOR_FORCE", "1") ||
+	    (isatty(STDOUT_FILENO) && !enveq("CLICOLOR", "0"));
+
+	if (withcolor)
 		enablecolor();
 
 	while (1) {
@@ -218,7 +207,7 @@ main(int argc, char **argv)
 			continue;
 		}
 
-		if (colorflag) {
+		if (withcolor) {
 			for (line = 0; line < TT_NLINES; line++) {
 				for (col = 0; col < TT_NCOLS; col++)
 					putcell_color(&page, line, col);
