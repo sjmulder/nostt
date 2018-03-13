@@ -4,7 +4,7 @@ nostt
 Command line NOS Teletekst reader for Unix-likes and Windows. Supports color
 and has an interactive mode.
 
-**nostt** [**-iG**] [*page*]
+**nostt** [*page*]
 
     $ nostt 102
                           NOS Teletekst 102 
