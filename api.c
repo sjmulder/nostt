@@ -8,11 +8,28 @@
 #include <string.h>
 #include <ctype.h>
 #include <wchar.h>
-#include <curl/curl.h>
 #include <json-c/json.h>
 #include "api.h"
 
-#define LEN(a) (sizeof(a)/sizeof(*(a)))
+#if USE_WINHTTP
+
+#include <windows.h>
+#include <winhttp.h>
+
+#ifndef WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY
+#define WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY 4
+#endif
+
+#else /* USE_WINHTTP */
+
+#include <curl/curl.h>
+
+#endif /* !USE_WINHTTP */
+
+#define LEN(a)		(sizeof(a)/sizeof(*(a)))
+#define MIN(a, b)	((a)>(b)?(b):(a))
+#define WIDE_(x)	L ## x
+#define WIDE(x)		WIDE_(x)
 
 enum parsest {
 	PS_IN_TEXT,
@@ -20,19 +37,18 @@ enum parsest {
 	PS_IN_ATTRQUOTES
 };
 
-/* see jsonwrite() below */
-struct jsonctx {
-	enum tterr		 err;
-	struct json_tokener	*tokener;
-	struct json_object	*object;
-};
-
 struct entity {
 	char	seq[10];
 	wchar_t	wc;
 };
 
-static char curlerrbuf[CURL_ERROR_SIZE];
+static int	lasterr_libc;
+#if USE_WINHTTP
+static DWORD	lasterr_win32;
+#else
+static char	curlerrbuf[CURL_ERROR_SIZE];
+#endif
+
 
 /* indexed by ttcolor */
 static const char *colornames[] = {
@@ -89,31 +105,6 @@ static const struct ttattrs defattrs = {
 	/* fg */	TT_WHITE,
 	/* bg */	TT_BLACK
 };
-
-/* Callback for curl; directly forwards data to the JSON parser. */
-static size_t
-jsonwrite(char *ptr, size_t sz, size_t nmemb, struct jsonctx *ctx)
-{
-	enum json_tokener_error jsonerr;
-
-	if (ctx->err != TT_OK)
-		return 0;
-
-	if (ctx->object) {
-		ctx->err = TT_EDATA;
-		return 0;
-	}
-
-	ctx->object = json_tokener_parse_ex(ctx->tokener, ptr,
-	    (int)(sz * nmemb));
-	if (!ctx->object) {
-		jsonerr = json_tokener_get_error(ctx->tokener);
-		if (jsonerr != json_tokener_continue)
-			ctx->err = TT_EDATA;
-	}
-
-	return sz * nmemb;
-}
 
 /* does nothing if no match */
 static void
@@ -184,7 +175,7 @@ parsecolors(const char *str, const char *end, struct ttattrs *attrs)
 		while (wordend < end && !isspace(*wordend))
 			wordend++;
 
-		parsecolor(str, wordend, color);	
+		parsecolor(str, wordend, color);
 
 		str = wordend;
 		while (str < end && isspace(*str))
@@ -312,34 +303,206 @@ parse(const char *html, struct ttpage *page)
 	return TT_OK;
 }
 
-enum tterr
-tt_get(const char *id, struct ttpage *page)
+#if USE_WINHTTP
+static WCHAR *
+awsubstr(const WCHAR *str, size_t n)
 {
-	enum tterr		 err	= TT_OK;
-	char			 url[128];
-	CURL			*curl	= NULL;
-	long			 status;
-	struct jsonctx		 json;
-	struct json_object	*jval;
-	const char		*html;
-	wchar_t			*wcp;
-	int			 line, col;
-	struct curl_slist	*list	= NULL;
+	WCHAR	*mem;
 
-	if (!id || !*id || !page)
-		return TT_EARG;
+	if (!(mem = malloc((n+1) * sizeof(WCHAR))))
+		return NULL;
+	memcpy(mem, str, n * sizeof(WCHAR));
+	mem[n] = L'\0';
+	return mem;
+}
 
-	memset(&json, 0, sizeof(json));
+static enum tterr
+fetchjson(const char *url, struct json_object **jroot)
+{
+	static const WCHAR *accept[] = {
+		L"application/json",
+		NULL
+	};
 
-	snprintf(url, LEN(url), ENDPOINT "%s", id);
-	url[LEN(url)-1] = '\0';
+	static HINTERNET	 session;
 
-	json.tokener = json_tokener_new();
+	enum tterr		 err		= TT_OK;
+	WCHAR			 wurl[128];
+	URL_COMPONENTS		 urlc;
+	DWORD			 flags;
+	BOOL			 ok;
+	WCHAR			*host		= NULL;
+	WCHAR			*path		= NULL;
+	HINTERNET		 conn		= 0;
+	HINTERNET		 req		= 0;
+	struct json_tokener	*tokener	= NULL;
+	enum json_tokener_error  jsonerr;
+	char			 buf[4096];
+	DWORD			 nbytes, nread;
 
-	if (!(curl = curl_easy_init())) {
-		err = TT_ECURL;
+	if (!session) {
+		session = WinHttpOpen(WIDE(USERAGENT),
+		    WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY,
+		    WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+		if (!session) {
+			err = TT_EWIN32;
+			goto cleanup;
+		}
+	}
+
+	if (!MultiByteToWideChar(CP_UTF8, 0, url, -1, wurl, LEN(wurl))) {
+		err = TT_EWIN32;
 		goto cleanup;
 	}
+
+	memset(&urlc, 0, sizeof(urlc));
+	urlc.dwStructSize = sizeof(urlc);
+	urlc.dwHostNameLength = -1;
+	urlc.dwUrlPathLength = -1;
+	urlc.dwExtraInfoLength = -1;
+
+	if (!WinHttpCrackUrl(wurl, 0, 0, &urlc)) {
+		err = TT_EWIN32;
+		goto cleanup;
+	}
+
+	host = awsubstr(urlc.lpszHostName, urlc.dwHostNameLength);
+	if (!host) {
+		err = TT_ELIBC;
+		goto cleanup;
+	}
+
+	path = awsubstr(urlc.lpszUrlPath, urlc.dwUrlPathLength +
+	    urlc.dwExtraInfoLength);
+	if (!host) {
+		err = TT_ELIBC;
+		goto cleanup;
+	}
+
+	conn = WinHttpConnect(session, host, urlc.nPort, 0);
+	if (!conn) {
+		err = TT_EWIN32;
+		goto cleanup;
+	}
+
+	flags = 0;
+	if (urlc.nScheme == INTERNET_SCHEME_HTTPS)
+		flags |= WINHTTP_FLAG_SECURE;
+
+	req = WinHttpOpenRequest(conn, L"GET", path, NULL, WINHTTP_NO_REFERER,
+	    accept, flags);
+	if (!req) {
+		err = TT_EWIN32;
+		goto cleanup;
+	}
+
+	ok = WinHttpSendRequest(req, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+	    WINHTTP_NO_REQUEST_DATA, 0, 0, 0);
+	if (!ok) {
+		err = TT_EWIN32;
+		goto cleanup;
+	}
+
+	tokener = json_tokener_new();
+	*jroot = NULL;
+
+	if (!WinHttpReceiveResponse(req, NULL)) {
+		err = TT_EWIN32;
+		goto cleanup;
+	}
+
+	while (WinHttpQueryDataAvailable(req, &nbytes)) {
+		if (*jroot) {
+			err = TT_EDATA;
+			return 0;
+		}
+
+		nbytes = MIN(nbytes, sizeof(buf));
+		ok = WinHttpReadData(req, buf, nbytes, &nread);
+		if (!ok) {
+			err = TT_EWIN32;
+			goto cleanup;
+		}
+
+		*jroot = json_tokener_parse_ex(tokener, buf, nread);
+		if (!*jroot) {
+			jsonerr = json_tokener_get_error(tokener);
+			if (jsonerr != json_tokener_continue) {
+				err = TT_EDATA;
+				return 0;
+			}
+		}
+
+		nbytes -= nread;
+	}
+
+	if (*jroot)
+		err = TT_EDATA;
+
+cleanup:
+	if (err == TT_ELIBC)
+		lasterr_libc = errno;
+	else if (err == TT_EWIN32)
+		lasterr_win32 = GetLastError();
+
+	if (tokener)
+		json_tokener_free(tokener);
+	if (req)
+		WinHttpCloseHandle(req);
+	if (conn)
+		WinHttpCloseHandle(conn);
+
+	free(path);
+	free(host);
+
+	return err;
+}
+#else /* USE_WINHTTP */
+struct jsonctx {
+	enum tterr		 err;
+	struct json_tokener	*tokener;
+	struct json_object	*object;
+};
+
+/* Callback for curl; directly forwards data to the JSON parser. */
+static size_t
+jsonwrite(char *ptr, size_t sz, size_t nmemb, struct jsonctx *ctx)
+{
+	enum json_tokener_error jsonerr;
+
+	if (ctx->err != TT_OK)
+		return 0;
+
+	if (ctx->object) {
+		ctx->err = TT_EDATA;
+		return 0;
+	}
+
+	ctx->object = json_tokener_parse_ex(ctx->tokener, ptr,
+	    (int)(sz * nmemb));
+	if (!ctx->object) {
+		jsonerr = json_tokener_get_error(ctx->tokener);
+		if (jsonerr != json_tokener_continue)
+			ctx->err = TT_EDATA;
+	}
+
+	return sz * nmemb;
+}
+
+static enum tterr
+fetchjson(const char *url, struct json_object **jroot)
+{
+	enum tterr		 err	= TT_OK;
+	struct jsonctx		 json;
+	CURL			*curl	= NULL;
+	struct curl_slist	*list	= NULL;
+	long			 status;
+
+	memset(&json, 0, sizeof(json));
+	json.tokener = json_tokener_new();
+
+	if (!(curl = curl_easy_init()))
+		return TT_ECURL;
 
 	curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curlerrbuf);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, USERAGENT);
@@ -363,45 +526,7 @@ tt_get(const char *id, struct ttpage *page)
 		goto cleanup;
 	}
 
-	if (!json.object ||
-	    !json_object_is_type(json.object, json_type_object)) {
-		err = TT_EDATA;
-		goto cleanup;
-	}
-
-	strncpy(page->id, id, LEN(page->id)-1);
-	page->id[LEN(page->id)-1] = '\0';
-	page->nextpage[0] = '\0';
-	page->nextsub[0] = '\0';
- 
-	if (json_object_object_get_ex(json.object, "nextPage", &jval)) {
-		strncpy(page->nextpage, json_object_get_string(jval),
-		    LEN(page->nextpage)-1);
-		page->nextpage[LEN(page->nextpage)-1] = '\0';
-	}
-
-	if (json_object_object_get_ex(json.object, "nextSubPage", &jval)) {
-		strncpy(page->nextsub, json_object_get_string(jval),
-		    LEN(page->nextsub)-1);
-		page->nextsub[LEN(page->nextsub)-1] = '\0';
-	}
-
-	if (!json_object_object_get_ex(json.object, "content", &jval) ||
-	    !(html = json_object_get_string(jval))) {
-		err = TT_EDATA;
-		goto cleanup;
-	}
-
-	parse(html, page);
-
-	/* Map block drawing characters */
-	for (line = 0; line < TT_NLINES; line++) {
-		for (col = 0; col < TT_NCOLS; col++) {
-			wcp = &page->chars[line][col];
-			if (*wcp >= 0xF000)
-				*wcp = SUBST_CHAR;	
-		}
-	}
+	*jroot = json.object;
 
 cleanup:
 	if (curl)
@@ -411,16 +536,102 @@ cleanup:
 
 	return err;
 }
+#endif /* !USE_WINHTTP */
+
+enum tterr
+tt_get(const char *id, struct ttpage *page)
+{
+	enum tterr		 err	= TT_OK;
+	char			 url[128];
+	struct json_object	*jroot;
+	struct json_object	*jval;
+	const char		*html;
+	wchar_t			*wcp;
+	int			 line, col;
+
+	if (!id || !*id || !page)
+		return TT_EARG;
+
+	snprintf(url, LEN(url), ENDPOINT "%s", id);
+	url[LEN(url)-1] = '\0';
+
+	if ((err = fetchjson(url, &jroot)) != TT_OK)
+		return err;
+
+	if (!jroot || !json_object_is_type(jroot, json_type_object))
+		return TT_EDATA;
+
+	strncpy(page->id, id, LEN(page->id)-1);
+	page->id[LEN(page->id)-1] = '\0';
+	page->nextpage[0] = '\0';
+	page->nextsub[0] = '\0';
+
+	if (json_object_object_get_ex(jroot, "nextPage", &jval)) {
+		strncpy(page->nextpage, json_object_get_string(jval),
+		    LEN(page->nextpage)-1);
+		page->nextpage[LEN(page->nextpage)-1] = '\0';
+	}
+
+	if (json_object_object_get_ex(jroot, "nextSubPage", &jval)) {
+		strncpy(page->nextsub, json_object_get_string(jval),
+		    LEN(page->nextsub)-1);
+		page->nextsub[LEN(page->nextsub)-1] = '\0';
+	}
+
+	if (!json_object_object_get_ex(jroot, "content", &jval) ||
+	    !(html = json_object_get_string(jval)))
+		return TT_EDATA;
+
+	parse(html, page);
+
+	/* Map block drawing characters */
+	for (line = 0; line < TT_NLINES; line++) {
+		for (col = 0; col < TT_NCOLS; col++) {
+			wcp = &page->chars[line][col];
+			if (*wcp >= 0xF000)
+				*wcp = SUBST_CHAR;
+		}
+	}
+
+	return err;
+}
 
 const char *
 tt_errstr(enum tterr err)
 {
+#if USE_WINHTTP
+	static char *msg_win32;
+
+	DWORD nchars;
+#endif
+
 	switch (err) {
 	case TT_OK:	return "no error";
-	case TT_EARG:	return "invalid argument";
+	case TT_ELIBC:	return strerror(lasterr_libc);
+#if !USE_WINHTTP
 	case TT_ECURL:	return curlerrbuf;
+#endif
+	case TT_EARG:	return "invalid argument";
 	case TT_EAPI:	return "API returned an error code";
 	case TT_EDATA:	return "API returned invalid or unexpected data";
-	default:	return "unknown error";
+
+#if USE_WINHTTP
+	case TT_EWIN32:
+		if (msg_win32) {
+			LocalFree(msg_win32);
+			msg_win32 = NULL;
+		}
+		nchars = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		    FORMAT_MESSAGE_FROM_SYSTEM, NULL, lasterr_win32, 0,
+		    (char*)&msg_win32, 0, NULL);
+		if (!nchars) {
+			msg_win32 = NULL;
+			return "Windows API error (failed to get message)";
+		}
+		return msg_win32;
+#endif
+
+	default:
+		return "unknown error";
 	}
 }

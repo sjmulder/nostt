@@ -17,8 +17,10 @@ enum ttcolor {
 
 enum tterr {
 	TT_OK,
-	TT_EARG,
+	TT_ELIBC,
 	TT_ECURL,
+	TT_EWIN32,
+	TT_EARG,
 	TT_EAPI,
 	TT_EDATA
 };
