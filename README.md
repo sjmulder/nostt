@@ -66,7 +66,7 @@ Ports and packages
 with [ports](https://www.freshports.org/multimedia/nostt/)
 or pkg:
 
-    pkg install nos-tt
+    pkg install nostt
 
 For other platforms, read on.
 
