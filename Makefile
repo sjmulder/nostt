@@ -1,5 +1,5 @@
-CFLAGS+=	-Wall -Wextra -g
-LDLIBS+=	-lcurl -ljson-c
+CFLAGS += -I/usr/local/include -Wall -Wextra -g
+LDLIBS += -L/usr/local/lib -lcurl -ljson-c
 
 all: nostt
 
