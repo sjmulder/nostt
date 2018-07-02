@@ -80,6 +80,10 @@ the Makefile as desired. Then:
 
     make
 
+    # also available:
+    make install
+    make uninstall
+
 Authors
 -------
 Sijmen J. Mulder (<ik@sjmulder.nl>)
