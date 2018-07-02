@@ -103,6 +103,11 @@ main(int argc, char **argv)
 	int		 interactive	= 0;
 	int		 line, col;
 
+#ifdef __OpenBSD__
+	if (pledge("stdio rpath inet dns", NULL) == -1)
+		err(1, "pledge");
+#endif
+
 	(void) argc;
 
 	argv0 = *argv;
