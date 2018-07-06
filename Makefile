@@ -1,4 +1,4 @@
-CFLAGS += -ansi -g
+CFLAGS += -std=c99 -g
 CFLAGS += -Wall -Wextra -pedantic
 CFLAGS += -D_POSIX_C_SOURCE=200809L
 CFLAGS += -I/usr/local/include
