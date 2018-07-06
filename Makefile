@@ -1,4 +1,8 @@
-CFLAGS += -I/usr/local/include -Wall -Wextra -g
+CFLAGS += -ansi -g
+CFLAGS += -Wall -Wextra -pedantic
+CFLAGS += -D_POSIX_C_SOURCE=200809L
+CFLAGS += -I/usr/local/include
+
 LDLIBS += -L/usr/local/lib -lcurl -ljson-c
 
 # BSD conventions by default, override to taste
