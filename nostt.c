@@ -45,7 +45,6 @@ enveq(const char *name, const char *val)
 static void
 putcell_color(struct ttpage *page, int line, int col)
 {
-	wchar_t		 wc;
 	struct ttattrs	*attrs;
 	struct ttattrs	*prevattrs;
 	int		 attrsflag;
@@ -59,10 +58,9 @@ putcell_color(struct ttpage *page, int line, int col)
 	}
 
 	if (attrsflag)
-		printf("\e[%d;%dm", 30 + attrs->fg, 40 + attrs->bg);
+		printf("\033[%d;%dm", 30 + attrs->fg, 40 + attrs->bg);
 
-	wc = page->chars[line][col];
-	printf("%lc", wc);
+	putwchar(page->chars[line][col]);
 }
 
 static const char *
@@ -146,11 +144,11 @@ main(int argc, char **argv)
 			for (line = 0; line < TT_NLINES; line++) {
 				for (col = 0; col < TT_NCOLS; col++)
 					putcell_color(&page, line, col);
-				puts("\e[0m");
+				puts("\033[0m");
 			}
 		} else {
 			for (line = 0; line < TT_NLINES; line++)
-				printf("%.*ls\n", TT_NCOLS, page.chars[line]);
+				wprintf(L"%.*s\n", TT_NCOLS, page.chars[line]);
 		}
 
 		if (interactive) {
