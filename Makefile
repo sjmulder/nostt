@@ -7,7 +7,8 @@ CFLAGS += -Wall -Wextra -pedantic
 CFLAGS += -D_POSIX_C_SOURCE=200809L
 CFLAGS += -I/usr/local/include
 
-LDLIBS += -L/usr/local/lib -lcurl -ljson-c
+LDLIBS += -L/usr/local/lib
+LDLIBS += -lcurl -ljson-c
 
 all: nostt
 
