@@ -29,4 +29,4 @@ nostt.o:  api.h compat.h
 api.o:    api.h
 compat.o: compat.h
 
-.PHONY: all clean
+.PHONY: all clean install uninstall
