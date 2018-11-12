@@ -5,7 +5,8 @@ MANPREFIX ?= $(PREFIX)/man
 CFLAGS += -Wall -Wextra
 CFLAGS += -I/usr/local/include
 
-LDLIBS += -L/usr/local/lib
+LDFLAGS += -L/usr/local/lib
+
 LDLIBS += -lcurl -ljson-c
 
 all: nostt
