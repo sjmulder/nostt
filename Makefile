@@ -2,9 +2,7 @@ DESTDIR   ?=
 PREFIX    ?= /usr/local
 MANPREFIX ?= $(PREFIX)/man
 
-CFLAGS += -std=c99 -g
-CFLAGS += -Wall -Wextra -pedantic
-CFLAGS += -D_POSIX_C_SOURCE=200809L
+CFLAGS += -Wall -Wextra
 CFLAGS += -I/usr/local/include
 
 LDLIBS += -L/usr/local/lib
