@@ -12,6 +12,9 @@ LDLIBS += -lcurl -ljson-c
 
 all: nostt
 
+check: nostt
+	./nostt 100 >/dev/null
+
 clean:
 	rm -f *.o nostt
 
@@ -31,4 +34,4 @@ nostt.o:  api.h compat.h
 api.o:    api.h
 compat.o: compat.h
 
-.PHONY: all clean install uninstall
+.PHONY: all check clean install uninstall

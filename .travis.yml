@@ -1,7 +1,5 @@
 language: c
-
-script:
-  - make && ./nostt 100 >/dev/null
+script: make all check
 
 compiler:
   - gcc
