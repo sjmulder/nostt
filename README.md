@@ -55,34 +55,31 @@ Color ouptut is disabled by default in MinTTY on Windows. This is because
 MinTTY redirects standard output. Set `CLICOLOR_FORCE` to 1 to force color
 output.
 
-Ports and packages
-------------------
-**macOS**, with [Homebrew](https://brew.sh)
-([tap](https://github.com/sjmulder/homebrew-tap))
+Running
+-------
+Should work on Windows and any Unix, including Linux and macOS.
+
+**Mac** users can install from
+[my Homebrew tap](https://github.com/sjmulder/homebrew-tap):
 
     brew install sjmulder/tap/nostt
 
-**FreeBSD**,
-with [ports](https://www.freshports.org/multimedia/nostt/)
-or pkg:
+**FreeBSD** users can install
+[multimedia/nostt](https://www.freshports.org/multimedia/nostt/)
+from ports or packages:
 
     pkg install nostt
 
-For other platforms, read on.
-
-Building
---------
-**nostt** should work on most Unix-like systems, as well as on Windows through
-[MinGW](http://mingw-w64.org/doku.php) and such. It depends on
+To build from source, first install dependencies
 [libcurl](https://curl.haxx.se/libcurl/) and
-[json-c](https://github.com/json-c/json-c). Once these are installed, modify
-the Makefile as desired. Then:
+[json-c](https://github.com/json-c/json-c). Then:
 
     make
+    make install   [DESTDIR=] [PREFIX=/usr/local] [MANPREFIX=PREFIX/man]
+    make uninstall [DESTDIR=] [PREFIX=/usr/local] [MANPREFIX=PREFIX/man]
 
-    # also available:
-    make install
-    make uninstall
+Building on Windows is supported through
+[MinGW](http://mingw-w64.org/doku.php).
 
 Authors
 -------
