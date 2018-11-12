@@ -1,5 +1,5 @@
-TBD
----
+1.1 (2018-11-12)
+----------------
  - New: 'make check' target.
  - Removed: -i option (interactive mode). Interactive mode is now used if no
    page argument is given.
