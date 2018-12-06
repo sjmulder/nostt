@@ -19,8 +19,8 @@ clean:
 
 install: nostt
 	install -d $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(MANPREFIX)/man1
-	install nostt   $(DESTDIR)$(PREFIX)/bin/
-	install nostt.1 $(DESTDIR)$(MANPREFIX)/man1/
+	install -m755 nostt   $(DESTDIR)$(PREFIX)/bin/
+	install -m644 nostt.1 $(DESTDIR)$(MANPREFIX)/man1/
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/nostt
