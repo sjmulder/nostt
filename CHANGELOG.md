@@ -1,5 +1,5 @@
-TBD
----
+1.1.1 (2018-12-06)
+------------------
  - Fixed: wrong implicit permissions in `make install`.
 
 1.1 (2018-11-12)
