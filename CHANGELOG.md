@@ -2,6 +2,7 @@ TBD
 ---
  - Fixed: build warning from mismatched callback signature.
  - New: type 'q' at the prompt to quit.
+ - New: next page suggested after last subpage (e.g. [101] after [101-4])
 
 1.1.1 (2018-12-06)
 ------------------

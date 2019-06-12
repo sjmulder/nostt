@@ -152,7 +152,9 @@ main(int argc, char **argv)
 
 		if (interactive) {
 			putchar('\n');
-			id = prompt(*page.nextsub ? page.nextsub : NULL);
+			id = prompt(
+			    *page.nextsub ? page.nextsub :
+			    *page.nextpage ? page.nextpage : NULL);
 			if (!id)
 				return 0;
 		} else if (id == argv[0] && strchr(id, '-')) {
