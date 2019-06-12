@@ -1,6 +1,7 @@
 TBD
 ---
  - Fixed: build warning from mismatched callback signature.
+ - New: type 'q' at the prompt to quit.
 
 1.1.1 (2018-12-06)
 ------------------

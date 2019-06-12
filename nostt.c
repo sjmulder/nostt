@@ -78,16 +78,15 @@ prompt(const char *suggestion)
 
 		if ((len = getline(&input, &cap, stdin)) == -1)
 			return NULL;
-		else if (!len) {
-			if (suggestion)
-				return suggestion;
-		} else if (input[len-1] == '\n') {
+		if (len && input[len-1] == '\n')
 			input[--len] = '\0';
-			if (len)
-				return input;
-			else if (suggestion)
-				return suggestion;
-		}
+
+		if (!strcmp("q", input))
+			return NULL;
+		else if (len)
+			return input;
+		else
+			return suggestion;
 	}
 }
 
@@ -134,7 +133,7 @@ main(int argc, char **argv)
 				errx(1, "%s", tt_errstr(ret));
 
 			warnx("%s", tt_errstr(ret));
-			puts("(press ^C to exit)\n");
+			puts("(q or ^C to exit)\n");
 			if (!(id = prompt(NULL)))
 				return 0;
 			continue;
