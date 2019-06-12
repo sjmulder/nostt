@@ -92,8 +92,9 @@ static const struct ttattrs defattrs = {
 
 /* Callback for curl; directly forwards data to the JSON parser. */
 static size_t
-jsonwrite(char *ptr, size_t sz, size_t nmemb, struct jsonctx *ctx)
+jsonwrite(char *ptr, size_t sz, size_t nmemb, void *userdata)
 {
+	struct jsonctx *ctx = (struct jsonctx *)userdata;
 	enum json_tokener_error jsonerr;
 
 	if (ctx->err != TT_OK)

@@ -1,6 +1,7 @@
 1.1.1 (2018-12-06)
 ------------------
  - Fixed: wrong implicit permissions in `make install`.
+ - Fixed: build warning from mismatched callback signature.
 
 1.1 (2018-11-12)
 ----------------
