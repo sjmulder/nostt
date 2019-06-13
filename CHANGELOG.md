@@ -2,7 +2,9 @@ TBD
 ---
  - Fixed: build warning from mismatched callback signature.
  - New: type 'q' at the prompt to quit.
- - New: next page suggested after last subpage (e.g. [101] after [101-4])
+ - New: next page suggested after last subpage (e.g. [101] after [101-4]).
+ - Change: drop /usr/local from default include and lib search path. System
+   search paths aren't for us to decide.
 
 1.1.1 (2018-12-06)
 ------------------

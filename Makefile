@@ -3,10 +3,6 @@ PREFIX    ?= /usr/local
 MANPREFIX ?= $(PREFIX)/man
 
 CFLAGS += -Wall -Wextra
-CFLAGS += -I/usr/local/include
-
-LDFLAGS += -L/usr/local/lib
-
 LDLIBS += -lcurl -ljson-c
 
 all: nostt
