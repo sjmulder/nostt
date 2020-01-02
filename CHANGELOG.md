@@ -1,5 +1,5 @@
-TBD
----
+1.2 (2020-01-02)
+----------------
  - Fixed: build warning from mismatched callback signature.
  - Fixed: only first column printed with colors off.
  - New: type 'q' at the prompt to quit.
