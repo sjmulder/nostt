@@ -1,6 +1,7 @@
 TBD
 ---
  - Fixed: build warning from mismatched callback signature.
+ - Fixed: only first column printed with colors off.
  - New: type 'q' at the prompt to quit.
  - New: next page suggested after last subpage (e.g. [101] after [101-4]).
  - Change: drop /usr/local from default include and lib search path. System

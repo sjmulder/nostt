@@ -147,7 +147,8 @@ main(int argc, char **argv)
 			}
 		} else {
 			for (line = 0; line < TT_NLINES; line++)
-				wprintf(L"%.*s\n", TT_NCOLS, page.chars[line]);
+				printf("%.*ls\n", TT_NCOLS,
+				    page.chars[line]);
 		}
 
 		if (interactive) {
