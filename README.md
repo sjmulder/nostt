@@ -3,8 +3,8 @@ nostt
 
 ![Build status](https://travis-ci.org/sjmulder/nostt.svg)
 
-Command line NOS Teletekst reader for Unix-likes and Windows. Supports color
-and has an interactive mode.
+Command line NOS Teletekst reader for Unix-likes and Windows. Supports
+color and has an interactive mode.
 
 **nostt** [*page*]
 
@@ -37,10 +37,10 @@ and has an interactive mode.
 
 Description
 -----------
-Displays the requested [NOS Teletekst](https://nos.nl/teletekst) page on the
-command line. Pages are identified by a three-digit number optionally followed
-by a subpage, for example 100 or 302-2. All subpages are printed if not
-specified.
+Displays the requested [NOS Teletekst](https://nos.nl/teletekst) page on
+the command line. Pages are identified by a three-digit number
+optionally followed by a subpage, for example 100 or 302-2. All subpages
+are printed if not specified.
 
 If no *page* argument is given, nostt runs interactively.
 
@@ -48,14 +48,14 @@ See the manual page for more details.
 
 Known issues
 ------------
-Teletext's 6-cell (2x3) block characters are displayed as % characters as they
-cannot be accurately reproduced in a terinal without special fonts. (The NOS
-viewer and API uses a custom font with these characters in the "private use"
-0xF000 Unicode range.)
+Teletext's 6-cell (2x3) block characters are displayed as % characters
+as they cannot be accurately reproduced in a terinal without special
+fonts.  (The NOS viewer and API uses a custom font with these characters
+in the "private use" 0xF000 Unicode range.)
 
-Color ouptut is disabled by default in MinTTY on Windows. This is because
-MinTTY redirects standard output. Set `CLICOLOR_FORCE` to 1 to force color
-output.
+Color ouptut is disabled by default in MinTTY on Windows. This is
+because MinTTY redirects standard output. Set `CLICOLOR_FORCE` to 1 to
+force color output.
 
 Running
 -------
