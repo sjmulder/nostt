@@ -30,7 +30,8 @@ enablecolor()
 
 	hout = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleMode(hout, &mode);
-	SetConsoleMode(hout, mode|4); /* ENABLE_VIRTUAL_TERMINAL_PROCESSING */
+	/* ENABLE_VIRTUAL_TERMINAL_PROCESSING */
+	SetConsoleMode(hout, mode|4);
 #endif
 }
 

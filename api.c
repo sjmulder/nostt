@@ -132,8 +132,10 @@ parsecolor(const char *str, const char *end, enum ttcolor *color)
 	}
 }
 
-/* Unescapes HTML entities. *endp will point to the first character past the
-   escape sequence. */
+/*
+ * Unescapes HTML entities. *endp will point to the first character
+ * past the escape sequence.
+ */
 static wchar_t
 unescape(const char *sequence, const char **endp)
 {
@@ -166,8 +168,10 @@ unescape(const char *sequence, const char **endp)
 	return '&';
 }
 
-/* parses class name lists like "red bg-white" into attrs->fg and attrs->bg,
-   or leaves them untouched if not specified */
+/*
+ * Parses class name lists like "red bg-white" into attrs->fg and
+ * attrs->bg, or leaves them untouched if not specified.
+ */
 static void
 parsecolors(const char *str, const char *end, struct ttattrs *attrs)
 {
@@ -193,22 +197,24 @@ parsecolors(const char *str, const char *end, struct ttattrs *attrs)
 	}
 }
 
-/* Very simple HTML parser. Only accepts the following sort of input:
-
-     <span class="red bg-white">NOS</span> TELETEKST
-     Nieuws  <span class="cyan"><a href="#101">101</a></span>
-     Sport   <span class="cyan"><a href="#102">102</a></span>
-
-   Every cell in the page is assigned, either with content, or with a space
-   character.
-
-   HTML element and attribute names themselves are ignored; if a tag contains
-   quotes it is assumed to be a class list. Any tag with a '/' in it is
-   considered a closing tag. Nesting is supported, but no self-closing tags
-   and such.
-
-   This may all seem horribly limited but it's only meant to parse the HTML
-   output from the API, which it does. */
+/*
+ * Very simple HTML parser. Only accepts the following sort of input:
+ *
+ *   <span class="red bg-white">NOS</span> TELETEKST
+ *   Nieuws  <span class="cyan"><a href="#101">101</a></span>
+ *   Sport   <span class="cyan"><a href="#102">102</a></span>
+ *
+ * Every cell in the page is assigned, either with content, or with a
+ * space character.
+ *
+ * HTML element and attribute names themselves are ignored; if a tag
+ * contains quotes it is assumed to be a class list. Any tag with a '/'
+ * in it is considered a closing tag. Nesting is supported, but no
+ * self-closing tags and such.
+ *
+ * This may all seem horribly limited but it's only meant to parse the
+ * HTML output from the API, which it does.
+ */
 static enum tterr
 parse(const char *html, struct ttpage *page)
 {
@@ -220,10 +226,10 @@ parse(const char *html, struct ttpage *page)
 	const char	*closequote	= NULL;
 	enum parsest	 state		= PS_IN_TEXT;
 	struct ttattrs	 curattrs	= defattrs;
-	struct ttattrs	 attrstack[8];
-	int		 attrdepth	= 0;
+	struct ttattrs	 atstack[8];
+	int		 atdepth	= 0;
 
-	attrstack[0] = defattrs;
+	atstack[0] = defattrs;
 
 	p = html;
 	while (line < TT_NLINES) {
@@ -252,14 +258,15 @@ parse(const char *html, struct ttpage *page)
 			switch (wc) {
 			case '<':
 				state = PS_IN_TAG;
-				if (++attrdepth < (int)LEN(attrstack))
-					attrstack[attrdepth] = curattrs;
+				if (++atdepth < (int)LEN(atstack))
+					atstack[atdepth] = curattrs;
 				break;
 			default:
 				/* ignore input beyond line length */
 				if (col < TT_NCOLS) {
 					page->chars[line][col] = wc;
-					page->attrs[line][col] = curattrs;
+					page->attrs[line][col] =
+					    curattrs;
 					col++;
 				}
 				break;
@@ -269,13 +276,15 @@ parse(const char *html, struct ttpage *page)
 		case PS_IN_TAG:
 			switch (wc) {
 			case '/':
-				/* End tag, pop attrs. Twice, because we just
-				   pushed on the start of this closing tag
-				   too. */
-				if ((attrdepth -= 2) < 0)
-					attrdepth = 0;
-				else if (attrdepth < (int)LEN(attrstack))
-					curattrs = attrstack[attrdepth+1];
+				/*
+				 * End tag, pop attrs. Twice, because we
+				 * just pushed on the start of this
+				 * closing tag too.
+				 */
+				if ((atdepth -= 2) < 0)
+					atdepth = 0;
+				else if (atdepth < (int)LEN(atstack))
+					curattrs = atstack[atdepth+1];
 				break;
 			case '"':
 				state = PS_IN_ATTRQUOTES;
@@ -299,8 +308,10 @@ parse(const char *html, struct ttpage *page)
 				break;
 			}
 			if (state != PS_IN_ATTRQUOTES) {
-				/* we assume the attribute is 'class', so
-				   parse the colors */
+				/*
+				 * We assume the attribute is 'class',
+				 * so parse the colors.
+				 */
 				parsecolors(openquote+1, closequote,
 				    &curattrs);
 			}
@@ -321,7 +332,7 @@ tt_get(const char *id, struct ttpage *page)
 	CURL			*curl	= NULL;
 	long			 status;
 	struct jsonctx		 json;
-	struct json_object	*jval;
+	struct json_object	*jobj, *jval;
 	const char		*html;
 	wchar_t			*wcp;
 	int			 line, col;
@@ -348,7 +359,8 @@ tt_get(const char *id, struct ttpage *page)
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, jsonwrite);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &json);
 
-	list = curl_slist_append(list, "Accept-Encoding: application/json");
+	list = curl_slist_append(list, "Accept-Encoding: "
+	    "application/json");
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 
 	if (curl_easy_perform(curl) != CURLE_OK) {
@@ -364,8 +376,9 @@ tt_get(const char *id, struct ttpage *page)
 		goto cleanup;
 	}
 
-	if (!json.object ||
-	    !json_object_is_type(json.object, json_type_object)) {
+	jobj = json.object;
+
+	if (!jobj || !json_object_is_type(jobj, json_type_object)) {
 		err = TT_EDATA;
 		goto cleanup;
 	}
@@ -375,19 +388,19 @@ tt_get(const char *id, struct ttpage *page)
 	page->nextpage[0] = '\0';
 	page->nextsub[0] = '\0';
  
-	if (json_object_object_get_ex(json.object, "nextPage", &jval)) {
+	if (json_object_object_get_ex(jobj, "nextPage", &jval)) {
 		strncpy(page->nextpage, json_object_get_string(jval),
 		    LEN(page->nextpage)-1);
 		page->nextpage[LEN(page->nextpage)-1] = '\0';
 	}
 
-	if (json_object_object_get_ex(json.object, "nextSubPage", &jval)) {
+	if (json_object_object_get_ex(jobj, "nextSubPage", &jval)) {
 		strncpy(page->nextsub, json_object_get_string(jval),
 		    LEN(page->nextsub)-1);
 		page->nextsub[LEN(page->nextsub)-1] = '\0';
 	}
 
-	if (!json_object_object_get_ex(json.object, "content", &jval) ||
+	if (!json_object_object_get_ex(jobj, "content", &jval) ||
 	    !(html = json_object_get_string(jval))) {
 		err = TT_EDATA;
 		goto cleanup;

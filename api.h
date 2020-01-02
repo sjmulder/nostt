@@ -28,13 +28,15 @@ struct ttattrs {
 	enum ttcolor	bg;
 };
 
-/* Note on block drawing characters:
-
-   Teletext supports 6-cell (2x3) block drawing characters. The NOS viewer
-   and API use a custom font with these characters in the 0xF000 Unicode
-   range ('private use').
-
-   These are all mapped to SUBST_CHAR, defined in api.c */
+/*
+ * Note on block drawing characters:
+ *
+ * Teletext supports 6-cell (2x3) block drawing characters. The NOS
+ * viewer and API use a custom font with these characters in the 0xF000
+ * Unicode range ('private use').
+ *
+ * These are all mapped to SUBST_CHAR, defined in api.c
+ */
 struct ttpage {
 	wchar_t		chars[TT_NLINES][TT_NCOLS];
 	struct ttattrs	attrs[TT_NLINES][TT_NCOLS];
