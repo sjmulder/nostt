@@ -1,6 +1,8 @@
 nostt
 =====
 
+![Build status](https://travis-ci.org/sjmulder/nostt.svg)
+
 Command line NOS Teletekst reader for Unix-likes and Windows. Supports color
 and has an interactive mode.
 
