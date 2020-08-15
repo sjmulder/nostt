@@ -5,6 +5,8 @@ nostt
  https://travis-ci.org/sjmulder/nostt.svg)](
  https://travis-ci.org/sjmulder/nostt)
 
+(Ook in het [Nederlands](README.nl.md))
+
 Command line NOS Teletekst reader for Unix-likes and Windows. Supports
 color and has an interactive mode.
 
@@ -46,7 +48,7 @@ are printed if not specified.
 
 If no *page* argument is given, nostt runs interactively.
 
-See the manual page for more details.
+See the manual page for more details: `man nostt`.
 
 Known issues
 ------------
@@ -55,32 +57,43 @@ as they cannot be accurately reproduced in a terinal without special
 fonts.  (The NOS viewer and API uses a custom font with these characters
 in the "private use" 0xF000 Unicode range.)
 
-Color ouptut is disabled by default in MinTTY on Windows. This is
+Color output is disabled by default in MinTTY on Windows. This is
 because MinTTY redirects standard output. Set `CLICOLOR_FORCE` to 1 to
-force color output.
+force color output: `env CLICOLOR_FORCE=1 nostt`
 
-Running
--------
+Installation
+------------
 Should work on Windows and any Unix, including Linux and macOS.
 
-**Mac** users can install from
-[my Homebrew tap](https://github.com/sjmulder/homebrew-tap):
+**macOS** with [Homebrew](https://brew.sh) from
+[my tap](https://github.com/sjmulder/homebrew-tap):
 
     brew install sjmulder/tap/nostt
 
-**FreeBSD** users can install
-[multimedia/nostt](https://www.freshports.org/multimedia/nostt/)
-from ports or packages:
+**NetBSD** (and more, using [pkgsrc](https://pkgsrc.org)):
+
+    pkg_add nostt
+
+**FreeBSD**:
 
     pkg install nostt
 
-To build from source, first install dependencies
-[libcurl](https://curl.haxx.se/libcurl/) and
-[json-c](https://github.com/json-c/json-c). Then:
+From **source**:
 
-    make
-    make install   [DESTDIR=] [PREFIX=/usr/local] [MANPREFIX=PREFIX/man]
-    make uninstall [DESTDIR=] [PREFIX=/usr/local] [MANPREFIX=PREFIX/man]
+ 1. Download and extract the source code of the
+    [latest release](https://github.com/sjmulder/nostt/releases).z
+
+ 2. Install the dependencies, e.g. on Debian or Ubuntu:
+
+        sudo apt install build-essential libcurl4-openssl-dev libjson-c-dev
+
+ 3. In the source directory:
+
+        make
+        sudo make install
+
+    See the Makefiel for more options. Uninstall with
+    `sudo make uninstall`.
 
 Building on Windows is supported through
 [MinGW](http://mingw-w64.org/doku.php).
