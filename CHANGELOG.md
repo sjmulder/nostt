@@ -1,5 +1,6 @@
 TBD
 ---
+ - New: Dutch translation of README.
  - Fixed: interactive prompt not printed with musl libc.
 
 1.2 (2020-01-02)
