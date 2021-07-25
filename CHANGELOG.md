@@ -1,3 +1,7 @@
+TBD
+---
+ - Fixed: interactive prompt not printed with musl libc.
+
 1.2 (2020-01-02)
 ----------------
  - Fixed: build warning from mismatched callback signature.

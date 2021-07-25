@@ -76,6 +76,7 @@ prompt(const char *suggestion)
 			printf("page [%s]? ", suggestion);
 		else
 			printf("page? ");
+		fflush(stdout);
 
 		if ((len = getline(&input, &cap, stdin)) == -1)
 			return NULL;
