@@ -2,8 +2,8 @@ nostt
 =====
 
 [![Build status](
- https://travis-ci.org/sjmulder/nostt.svg)](
- https://travis-ci.org/sjmulder/nostt)
+ https://builds.sr.ht/~sjmulder/nostt.svg)](
+ https://builds.sr.ht/~sjmulder/nostt)
 
 (Ook in het [Nederlands](README.nl.md))
 
