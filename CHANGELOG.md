@@ -1,5 +1,5 @@
-TBD
----
+1.2.1 (2020-07-25)
+------------------
  - New: Dutch translation of README.md.
  - Fixed: interactive prompt not printed with musl libc.
  - Fixed: typos in README.md.
