@@ -1,7 +1,8 @@
 TBD
 ---
- - New: Dutch translation of README.
+ - New: Dutch translation of README.md.
  - Fixed: interactive prompt not printed with musl libc.
+ - Fixed: typos in README.md.
  - Change: migrated builds from Travis to sr.ht.
 
 1.2 (2020-01-02)

@@ -81,7 +81,7 @@ Should work on Windows and any Unix, including Linux and macOS.
 From **source**:
 
  1. Download and extract the source code of the
-    [latest release](https://github.com/sjmulder/nostt/releases).z
+    [latest release](https://github.com/sjmulder/nostt/releases).
 
  2. Install the dependencies, e.g. on Debian or Ubuntu:
 
@@ -92,7 +92,7 @@ From **source**:
         make
         sudo make install
 
-    See the Makefiel for more options. Uninstall with
+    See the Makefile for more options. Uninstall with
     `sudo make uninstall`.
 
 Building on Windows is supported through
