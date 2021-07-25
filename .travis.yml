@@ -1,9 +1,0 @@
-language: c
-script: make all check
-os: ['linux', 'osx']
-
-addons:
-  apt:
-    packages:
-      - libjson-c-dev
-      - libcurl4-openssl-dev

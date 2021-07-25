@@ -2,6 +2,7 @@ TBD
 ---
  - New: Dutch translation of README.
  - Fixed: interactive prompt not printed with musl libc.
+ - Change: migrated builds from Travis to sr.ht.
 
 1.2 (2020-01-02)
 ----------------
