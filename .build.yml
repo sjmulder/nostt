@@ -2,7 +2,7 @@ image: debian/stable
 packages:
  - libjson-c-dev
  - libcurl4-openssl-dev
-sources: 
+sources:
  - https://github.com/sjmulder/nostt
 tasks:
  - build: cd nostt && make all check
