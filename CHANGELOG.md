@@ -1,3 +1,8 @@
+1.2.2 (2022-06-15)
+------------------
+ - Fixed: API error caused by use of old HTTP endpoint. Switched to
+   same endpoint but HTTPS.
+
 1.2.1 (2020-07-25)
 ------------------
  - New: Dutch translation of README.md.
