@@ -83,6 +83,10 @@ From **source**:
  1. Download and extract the source code of the
     [latest release](https://github.com/sjmulder/nostt/releases).
 
+        wget https://github.com/sjmulder/nostt/archive/refs/tags/1.2.2.tar.gz
+        tar -xvzf 1.2.2.tar.gz
+        cd nostt-1.2.2/
+
  2. Install the dependencies, e.g. on Debian or Ubuntu:
 
         sudo apt install build-essential libcurl4-openssl-dev libjson-c-dev
