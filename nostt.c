@@ -107,6 +107,8 @@ main(int argc, char **argv)
 		err(1, "unveil: /etc/ssl/cert.pem");
 	if (unveil("/etc/ssl/openssl.cnf", "r") == -1)
 		err(1, "unveil: /etc/ssl/openssl.cnf");
+	if (unveil("/usr/share/locale", "r") == -1)
+		err(1, "unveil: /usr/share/locale");
 	if (pledge("stdio rpath inet dns", NULL) == -1)
 		err(1, "pledge");
 #endif
