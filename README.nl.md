@@ -1,10 +1,5 @@
 nostt
 =====
-
-[![Buildstatus](
- https://builds.sr.ht/~sjmulder/nostt.svg)](
- https://builds.sr.ht/~sjmulder/nostt)
-
 (Also in [English](README.md))
 
 Lees NOS Teletekst op de commandline. Met ondersteuning voor kleur en
