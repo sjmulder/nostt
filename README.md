@@ -1,10 +1,5 @@
 nostt
 =====
-
-[![Build status](
- https://builds.sr.ht/~sjmulder/nostt.svg)](
- https://builds.sr.ht/~sjmulder/nostt)
-
 (Ook in het [Nederlands](README.nl.md))
 
 Command line NOS Teletekst reader for Unix-likes and Windows. Supports
