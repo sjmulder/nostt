@@ -15,3 +15,10 @@ jobs:
     - run: brew install json-c  # curl comes preinstalled
     - run: make
     - run: make check
+  build-cmake:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: sudo apt-get install -y libcurl4-openssl-dev libjson-c-dev
+    - run: cmake -B build
+    - run: cmake --build build
