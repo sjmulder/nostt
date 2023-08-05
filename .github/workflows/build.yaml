@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - run: apt install -y libcurl4-openssl-dev libjson-c-dev
+    - run: sudo apt install -y libcurl4-openssl-dev libjson-c-dev
     - run: make
     - run: make check
   build-macos:
