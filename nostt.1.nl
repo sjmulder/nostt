@@ -1,4 +1,4 @@
-.Dd Feb 26, 2018
+.Dd 5 augustus 2023
 .Dt NOSTT 1
 .Os
 .Sh NAAM
