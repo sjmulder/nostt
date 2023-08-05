@@ -3,3 +3,4 @@ nostt.exe
 *.o
 nostt-*.zip
 nostt-*/
+.idea/
