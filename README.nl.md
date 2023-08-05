@@ -101,7 +101,8 @@ Vanaf **broncode**:
     `sudo make uninstall`.
 
 Op **Windows** is compilatie mogelijk met
-[MinGW](http://mingw-w64.org/doku.php).
+[MinGW](http://mingw-w64.org/doku.php). Voor het gemak is er ook een
+CMake-projectbestand aanwezig.
 
 Auteur
 ------

@@ -96,7 +96,8 @@ From **source**:
     `sudo make uninstall`.
 
 Building on Windows is supported through
-[MinGW](http://mingw-w64.org/doku.php).
+[MinGW](http://mingw-w64.org/doku.php). A CMake build file is also
+included for convenience.
 
 Authors
 -------
