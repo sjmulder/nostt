@@ -1,3 +1,12 @@
+1.3 (2023-08-03)
+----------------
+ - Fixed: typo and style in man page (thanks Omar Polo).
+ - New: Dutch translation of the man page.
+ - New: unveil() support on OpenBSD (thanks Tim van der Molen).
+ - New: support for NO_COLOR=1 (http://no-color.org).
+ - New: non-canonical CMake build file.
+ - Change: migrated builds from sr.ht to GitHub Actions.
+
 1.2.2 (2022-06-15)
 ------------------
  - Fixed: API error caused by use of old HTTP endpoint. Switched to
