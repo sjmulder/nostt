@@ -20,11 +20,17 @@ argument is given,
 runs interactively.
 .Sh ENVIRONMENT
 .Bl -tag -width LC_MONETARY
+.It Ev NO_COLOR
+When set to 1, color output is disabled.
 .It Ev CLICOLOR
 When set to 0, color output is disabled.
 .It Ev CLICOLOR_FORCE
-When set to 1, color output is enabled even output is redirect to a pipe or
-file.
+When set to 1, color output is enabled
+even output is redirect to a pipe or file.
+Note that
+.Ev NO_COLOR=1 and
+.Ev CLICOLOR=0
+take precedence.
 .El
 .Sh SEE ALSO
 Project page:

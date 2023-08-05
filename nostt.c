@@ -128,8 +128,9 @@ main(int argc, char **argv)
 	}
 
 	withcolor =
-	    enveq("CLICOLOR_FORCE", "1") ||
-	    (isatty(STDOUT_FILENO) && !enveq("CLICOLOR", "0"));
+	    !enveq("NO_COLOR", "1") &&
+	    !enveq("CLICOLOR", "0") &&
+	    (enveq("CLICOLOR_FORCE", "1") || isatty(STDOUT_FILENO));
 
 	if (withcolor)
 		enablecolor();
