@@ -12,6 +12,6 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
-    - run: brew install curl json-c
+    - run: brew install json-c  # curl comes preinstalled
     - run: make
     - run: make check
