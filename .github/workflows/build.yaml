@@ -20,5 +20,5 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - run: sudo apt-get install -y libcurl4-openssl-dev libjson-c-dev
-    - run: mkdir build && cd build && cmake ..
-    - run: cd build && cmake --build ..
+    - run: cmake -B build
+    - run: cmake --build build
