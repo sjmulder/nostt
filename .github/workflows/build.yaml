@@ -7,6 +7,8 @@ jobs:
       matrix:
         agent: [ubuntu-20.04, ubuntu-22.04]
     runs-on: ${{ matrix.agent }}
+    env:
+      CFLAGS: '-Werror'
     steps:
     - uses: actions/checkout@v3
     - run: sudo apt-get install -y libcurl4-openssl-dev libjson-c-dev
@@ -18,6 +20,8 @@ jobs:
       matrix:
         agent: [macos-12, macos-14]
     runs-on: ${{ matrix.agent }}
+    env:
+      CFLAGS: '-Werror'
     steps:
     - uses: actions/checkout@v3
     - run: brew install json-c  # curl comes preinstalled
@@ -47,6 +51,7 @@ jobs:
     runs-on: debian12-agent
     env:
       CC: '${{ matrix.cc }}'
+      CFLAGS: '-Werror'
     steps:
     - uses: actions/checkout@v3
     - run: make
