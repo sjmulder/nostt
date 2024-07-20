@@ -1,0 +1,21 @@
+name: codeql
+on: push
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+    - uses: github/codeql-action/init@v3
+      with:
+        languages: c-cpp
+        build-mode: manual
+    - run: make
+    - uses: github/codeql-action/analyze@v3
+      with:
+        category: '/language:c-cpp'
