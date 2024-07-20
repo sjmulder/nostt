@@ -47,8 +47,8 @@ jobs:
         - clang-14
         - clang-15
         - clang-16
-        - musl-gcc
         - tcc
+        #- musl-gcc  # no suitable libcurl
     runs-on: debian12-agent
     env:
       CC: '${{ matrix.cc }}'
