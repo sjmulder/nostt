@@ -31,3 +31,23 @@ jobs:
     - run: sudo apt-get install -y libcurl4-openssl-dev libjson-c-dev
     - run: cmake -B build
     - run: cmake --build build
+
+  debian:
+    strategy:
+      matrix:
+        cc:
+        - gcc-11
+        - gcc-12
+        - clang-13
+        - clang-14
+        - clang-15
+        - clang-16
+        - musl-gcc
+        - tcc
+    runs-on: debian12-agent
+    env:
+      CC: '${{ matrix.cc }}'
+    steps:
+    - uses: actions/checkout@v3
+    - run: make
+    - run: make check
