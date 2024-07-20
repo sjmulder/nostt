@@ -2,7 +2,7 @@ name: build
 on: push
 
 jobs:
-  build-ubuntu:
+  ubuntu:
     strategy:
       matrix:
         agent: [ubuntu-20.04, ubuntu-22.04]
@@ -13,7 +13,7 @@ jobs:
     - run: make
     - run: make check
 
-  build-macos:
+  macos:
     strategy:
       matrix:
         agent: [macos-12, macos-14]
@@ -24,7 +24,7 @@ jobs:
     - run: make
     - run: make check
 
-  build-cmake:
+  cmake:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
