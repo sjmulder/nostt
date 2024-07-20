@@ -3,19 +3,27 @@ on: push
 
 jobs:
   build-ubuntu:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        agent: [ubuntu-20.04, ubuntu-22.04]
+    runs-on: ${{ matrix.agent }}
     steps:
     - uses: actions/checkout@v3
     - run: sudo apt-get install -y libcurl4-openssl-dev libjson-c-dev
     - run: make
     - run: make check
+
   build-macos:
-    runs-on: macos-latest
+    strategy:
+      matrix:
+        agent: [macos-12, macos-14]
+    runs-on: ${{ matrix.agent }}
     steps:
     - uses: actions/checkout@v3
     - run: brew install json-c  # curl comes preinstalled
     - run: make
     - run: make check
+
   build-cmake:
     runs-on: ubuntu-latest
     steps:
