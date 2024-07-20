@@ -21,7 +21,8 @@ jobs:
         agent: [macos-12, macos-14]
     runs-on: ${{ matrix.agent }}
     env:
-      CFLAGS: '-Werror'
+      CFLAGS: '-I/opt/homebrew/include -Werror'
+      LDFLAGS: '-L/opt/homebrew/lib'
     steps:
     - uses: actions/checkout@v3
     - run: brew install json-c  # curl comes preinstalled
