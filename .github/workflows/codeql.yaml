@@ -15,6 +15,7 @@ jobs:
       with:
         languages: c-cpp
         build-mode: manual
+    - run: sudo apt-get install -y libcurl4-openssl-dev libjson-c-dev
     - run: make
     - uses: github/codeql-action/analyze@v3
       with:
