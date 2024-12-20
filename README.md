@@ -1,3 +1,10 @@
+This repository has **moved** to:
+
+https://codeberg.org/sjmulder/nostt
+
+The GitHub repository will be deleted in time.
+___
+
 nostt
 =====
 (Ook in het [Nederlands](README.nl.md))
